@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng ký Quán Mới | Ăn Chay Sài Gòn</title>
+    <title>Thêm quán chay/nhà hàng chay vào anchaysaigon.com</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -11,64 +11,140 @@
 
     <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
         
-        <div class="bg-green-600 text-white p-6 text-center">
-            <h1 class="text-2xl font-bold"><i class="fa-solid fa-store mr-2"></i>Đăng Ký Quán Chay</h1>
-            <p class="text-green-100 text-sm mt-1">Thông tin sẽ được ban quản trị kiểm duyệt trước khi hiển thị</p>
+        <div class="bg-green-600 text-white p-6 md:p-8 text-center">
+            <h1 class="text-2xl md:text-3xl font-bold mb-2">
+                <i class="fa-solid fa-store mr-2"></i>Đăng Ký Đối Tác
+            </h1>
+            <p class="text-green-50 text-base md:text-lg">Thêm quán chay / nhà hàng / cửa hàng chay vào hệ thống <strong>anchaysaigon.com</strong></p>
         </div>
 
-        <form id="addShopForm" class="p-6 space-y-6">
+        <div class="bg-blue-50 border-b border-blue-100 p-5 md:p-6 text-blue-800 text-sm md:text-base">
+            <h4 class="font-bold mb-3 text-blue-900"><i class="fa-solid fa-circle-info mr-1"></i> Hướng dẫn đăng ký (Miễn phí 100%):</h4>
+            <ul class="list-disc pl-5 space-y-2">
+                <li><strong>Số điện thoại Zalo:</strong> Hãy nhập đúng SĐT Zalo mà quán dùng để chốt đơn. Khi khách đặt món, đơn hàng sẽ được chuyển thẳng vào Zalo này.</li>
+                <li><strong>Link ảnh bìa:</strong> Copy một đường link ảnh mặt tiền quán hoặc món ăn nổi bật nhất để thu hút khách.</li>
+                <li><strong>Quy trình:</strong> Sau khi bạn bấm Gửi, Ban Quản Trị sẽ kiểm duyệt thông tin và cho hiển thị quán của bạn lên website trong thời gian sớm nhất.</li>
+            </ul>
+        </div>
+
+        <form id="addShopForm" class="p-6 md:p-8 space-y-8">
             <div class="space-y-4">
-                <h3 class="font-bold text-gray-800 border-b pb-2">1. Thông tin cơ bản</h3>
+                <h3 class="font-bold text-gray-800 text-lg border-b pb-2">1. Thông tin cửa hàng</h3>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Tên Quán *</label>
-                    <input type="text" id="shopName" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="VD: Chay Diệu Tâm">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tên Quán / Cửa hàng *</label>
+                    <input type="text" id="shopName" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="VD: Chay Diệu Tâm, Tạp Hoá Chay Xanh...">
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Thuộc Thành Phố *</label>
-                        <select id="shopCity" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Thuộc Khu Vực *</label>
+                        <select id="shopCity" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
                             <option value="">-- Đang tải danh sách... --</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại Zalo (Nhận đơn) *</label>
-                        <input type="tel" id="shopZalo" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="VD: 0901234567">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">SĐT Zalo (Nhận đơn hàng) *</label>
+                        <input type="tel" id="shopZalo" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="VD: 0901234567">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ chi tiết *</label>
-                    <input type="text" id="shopAddress" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="VD: 123 Lê Lợi, Phường Bến Thành, Quận 1">
+                    <input type="text" id="shopAddress" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="VD: 123 Lê Lợi, Phường Bến Thành, Quận 1">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Link Ảnh Bìa (URL) *</label>
-                    <input type="url" id="shopImage" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Dán link ảnh (VD: https://...)">
+                    <input type="url" id="shopImage" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Dán link ảnh (VD: https://...)">
+                </div>
+
+                <div class="pt-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Danh mục món bán (Có thể chọn nhiều) *</label>
+                    <div class="flex flex-wrap gap-2.5" id="categorySelection">
+                        <label class="cursor-pointer">
+                            <input type="checkbox" value="cơm chay" class="peer sr-only shop-category">
+                            <span class="block px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 transition select-none">Cơm chay</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" value="cơm chay thập cẩm" class="peer sr-only shop-category">
+                            <span class="block px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 transition select-none">Cơm chay thập cẩm</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" value="mì chay" class="peer sr-only shop-category">
+                            <span class="block px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 transition select-none">Mì chay</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" value="bún chay" class="peer sr-only shop-category">
+                            <span class="block px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 transition select-none">Bún chay</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" value="phở chay" class="peer sr-only shop-category">
+                            <span class="block px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 transition select-none">Phở chay</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" value="hủ tiếu chay" class="peer sr-only shop-category">
+                            <span class="block px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 transition select-none">Hủ tiếu chay</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" value="thực phẩm chay" class="peer sr-only shop-category">
+                            <span class="block px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 transition select-none">Thực phẩm chay</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" value="hoa quả" class="peer sr-only shop-category">
+                            <span class="block px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 transition select-none">Hoa quả</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" value="rau củ" class="peer sr-only shop-category">
+                            <span class="block px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 transition select-none">Rau củ</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" value="đồ khô chay" class="peer sr-only shop-category">
+                            <span class="block px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 transition select-none">Đồ khô chay</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" value="gia vị chay" class="peer sr-only shop-category">
+                            <span class="block px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 transition select-none">Gia vị chay</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" value="sườn chay" class="peer sr-only shop-category">
+                            <span class="block px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 transition select-none">Sườn chay</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" value="đồ chay đông lạnh" class="peer sr-only shop-category">
+                            <span class="block px-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 transition select-none">Đồ chay đông lạnh</span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-4 pt-4">
                 <div class="flex justify-between items-center border-b pb-2">
-                    <h3 class="font-bold text-gray-800">2. Thực Đơn (Menu)</h3>
-                    <button type="button" onclick="addMenuItem()" class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 font-semibold"><i class="fa-solid fa-plus mr-1"></i> Thêm món</button>
+                    <h3 class="font-bold text-gray-800 text-lg">2. Thực Đơn (Menu)</h3>
+                    <button type="button" onclick="addMenuItem()" class="text-sm bg-blue-100 text-blue-700 px-4 py-1.5 rounded-lg hover:bg-blue-200 font-semibold transition"><i class="fa-solid fa-plus mr-1"></i> Thêm món</button>
                 </div>
                 <div id="menuContainer" class="space-y-3"></div>
             </div>
 
-            <div class="pt-4 border-t">
-                <button type="submit" id="saveBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-colors flex justify-center items-center text-lg">
+            <div class="pt-6 border-t">
+                <button type="submit" id="saveBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-4 rounded-xl shadow-lg transition transform hover:-translate-y-0.5 flex justify-center items-center text-lg">
                     <i class="fa-solid fa-paper-plane mr-2"></i> Gửi Yêu Cầu Đăng Ký
                 </button>
                 <div id="statusMessage" class="mt-4 text-center text-sm font-semibold hidden"></div>
             </div>
+            
+            <div class="mt-8 text-center border-t pt-8">
+                <p class="text-gray-500 text-sm mb-3">Bạn cần hỗ trợ tạo cửa hàng hoặc hướng dẫn lấy link ảnh?</p>
+                <a href="https://zalo.me/0909108890" target="_blank" class="inline-flex items-center justify-center bg-white border border-gray-300 hover:border-blue-500 hover:bg-blue-50 text-gray-700 hover:text-blue-600 font-medium py-2.5 px-6 rounded-full transition shadow-sm">
+                    <i class="fa-solid fa-headset text-green-600 mr-2 text-lg"></i> Liên hệ Zalo Admin: <strong class="ml-1">0909 10 88 90</strong>
+                </a>
+            </div>
+
         </form>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        // Đổi setDoc thành addDoc để tạo ID ngẫu nhiên
         import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -88,14 +164,14 @@
             menuItemCount++;
             const container = document.getElementById('menuContainer');
             const html = `
-                <div class="flex gap-2 bg-gray-50 p-3 rounded border menu-item-row" id="menuRow_${menuItemCount}">
+                <div class="flex gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200 menu-item-row items-center" id="menuRow_${menuItemCount}">
                     <div class="flex-1">
-                        <input type="text" class="menu-name w-full px-2 py-1.5 border rounded focus:ring-green-500 focus:outline-none text-sm" placeholder="Tên món (VD: Cơm tấm chay)" required>
+                        <input type="text" class="menu-name w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 focus:outline-none text-sm" placeholder="Tên món (VD: Cơm tấm chay)" required>
                     </div>
                     <div class="w-1/3">
-                        <input type="number" class="menu-price w-full px-2 py-1.5 border rounded focus:ring-green-500 focus:outline-none text-sm" placeholder="Giá (VD: 35000)" required>
+                        <input type="number" class="menu-price w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 focus:outline-none text-sm" placeholder="Giá (VNĐ)" required>
                     </div>
-                    <button type="button" onclick="removeMenuItem(${menuItemCount})" class="text-red-500 hover:text-red-700 px-3"><i class="fa-solid fa-trash"></i></button>
+                    <button type="button" onclick="removeMenuItem(${menuItemCount})" class="text-red-400 hover:text-red-600 px-2 transition"><i class="fa-solid fa-circle-xmark text-lg"></i></button>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', html);
@@ -105,18 +181,21 @@
             const row = document.getElementById(`menuRow_${id}`);
             if (row) row.remove();
         }
+        
+        // Mở sẵn 2 dòng cho quán nhập
+        window.addMenuItem();
         window.addMenuItem();
 
         async function loadCitiesToSelect() {
             const citySelect = document.getElementById('shopCity');
             try {
                 const querySnapshot = await getDocs(collection(db, "locations"));
-                citySelect.innerHTML = '<option value="">-- Chọn thành phố --</option>';
+                citySelect.innerHTML = '<option value="">-- Chọn khu vực --</option>';
                 querySnapshot.forEach((doc) => {
                     const city = doc.data();
                     citySelect.innerHTML += `<option value="${city.slug}">${city.name}</option>`;
                 });
-            } catch (error) { console.error("Lỗi:", error); }
+            } catch (error) { console.error("Lỗi tải khu vực:", error); }
         }
         loadCitiesToSelect();
 
@@ -125,8 +204,15 @@
             const btn = document.getElementById('saveBtn');
             const statusDiv = document.getElementById('statusMessage');
             
+            // Validate danh mục
+            const checkedCategories = Array.from(document.querySelectorAll('.shop-category:checked')).map(cb => cb.value);
+            if (checkedCategories.length === 0) {
+                alert("Vui lòng chọn ít nhất một danh mục món bán (Cơm, Bún, Thực phẩm...)!");
+                return;
+            }
+
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang xử lý...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang xử lý dữ liệu...';
             statusDiv.classList.add('hidden');
 
             try {
@@ -136,7 +222,8 @@
                     address: document.getElementById('shopAddress').value.trim(),
                     zalo_phone: document.getElementById('shopZalo').value.trim(),
                     image: document.getElementById('shopImage').value.trim(),
-                    status: "pending", // THÊM TRẠNG THÁI CHỜ DUYỆT
+                    categories: checkedCategories,
+                    status: "pending", 
                     timestamp: new Date().getTime(),
                     menu: []
                 };
@@ -148,21 +235,31 @@
                     if (mName && mPrice) shopData.menu.push({ name: mName, price: mPrice });
                 });
 
-                if(shopData.menu.length === 0) throw new Error("Vui lòng thêm ít nhất 1 món ăn.");
+                if(shopData.menu.length === 0) throw new Error("Vui lòng thêm ít nhất 1 món ăn/sản phẩm vào thực đơn.");
 
-                // addDoc sẽ tạo ID ngẫu nhiên, không sợ ghi đè
+                // Gửi lên Firebase
                 await addDoc(collection(db, "shops"), shopData);
 
-                statusDiv.innerText = `✅ Đã gửi yêu cầu thành công! Ban quản trị sẽ duyệt sớm nhất.`;
-                statusDiv.className = "mt-4 text-center text-sm font-semibold text-green-600 block";
+                // Thông báo thành công
+                statusDiv.innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-4 rounded-lg flex items-center justify-center flex-col gap-2">
+                        <i class="fa-solid fa-circle-check text-3xl"></i>
+                        <p><strong>Gửi yêu cầu thành công!</strong></p>
+                        <p class="text-xs">Quán của bạn sẽ được hiển thị sau khi Ban quản trị xét duyệt.</p>
+                    </div>`;
+                statusDiv.className = "mt-6 block";
                 
+                // Xóa form
                 this.reset();
                 document.getElementById('menuContainer').innerHTML = '';
                 window.addMenuItem();
+                window.addMenuItem();
+                
+                statusDiv.scrollIntoView({ behavior: "smooth", block: "center" });
 
             } catch (error) {
-                statusDiv.innerText = `❌ Lỗi: ${error.message}`;
-                statusDiv.className = "mt-4 text-center text-sm font-semibold text-red-600 block";
+                statusDiv.innerHTML = `<div class="bg-red-50 text-red-600 p-3 rounded-lg border border-red-200">❌ Lỗi: ${error.message}</div>`;
+                statusDiv.className = "mt-4 block";
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i> Gửi Yêu Cầu Đăng Ký';
