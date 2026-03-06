@@ -3,29 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bơm Dữ Liệu Quán Ăn - Ăn Chay Sài Gòn</title>
+    <title>Ăn Chay Sài Gòn - Đặt món chay qua Zalo</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #22c55e; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
-<body class="bg-gray-100 p-8">
+<body class="bg-gray-50 font-sans pb-24">
 
-    <div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-md text-center">
-        <h1 class="text-2xl font-bold text-orange-500 mb-2">Bơm Dữ Liệu 20 Quán Chay TP.HCM</h1>
-        <p class="text-gray-600 mb-6 text-sm">Trang này sẽ tự động đẩy danh sách 20 quán kèm menu vào Database của bạn.</p>
-        
-        <button id="uploadBtn" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg w-full shadow-md transition-all">
-            🚀 Bấm vào đây để đẩy 20 Quán lên
-        </button>
-
-        <div id="logArea" class="mt-6 text-left bg-gray-50 p-4 border rounded h-64 overflow-y-auto text-sm font-mono text-gray-700">
-            Đang chờ lệnh...
+    <header class="bg-green-600 text-white p-4 sticky top-0 z-50 shadow-md">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-xl font-bold"><i class="fa-solid fa-leaf mr-2"></i>Ăn Chay Sài Gòn</h1>
+            <i class="fa-solid fa-bars text-xl cursor-pointer"></i>
         </div>
+        
+        <div class="flex gap-2 bg-white p-1 rounded-lg">
+            <select id="citySelect" class="bg-transparent text-gray-700 outline-none border-r border-gray-300 px-2 text-sm max-w-[130px] truncate">
+                <option value="">Tất cả khu vực</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="Tìm tên quán, món ăn..." class="w-full px-2 text-gray-700 outline-none text-sm">
+            <button class="bg-green-500 text-white px-3 py-1 rounded-md"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+    </header>
+
+    <div class="flex overflow-x-auto gap-3 p-4 bg-white shadow-sm hide-scroll" id="categoryTags">
+        <button class="filter-btn active px-4 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold whitespace-nowrap" data-keyword="">Tất cả</button>
+        <button class="filter-btn px-4 py-1 bg-gray-100 text-gray-700 rounded-full text-sm whitespace-nowrap" data-keyword="cơm">Cơm</button>
+        <button class="filter-btn px-4 py-1 bg-gray-100 text-gray-700 rounded-full text-sm whitespace-nowrap" data-keyword="bún">Bún / Phở</button>
+        <button class="filter-btn px-4 py-1 bg-gray-100 text-gray-700 rounded-full text-sm whitespace-nowrap" data-keyword="lẩu">Lẩu chay</button>
+        <button class="filter-btn px-4 py-1 bg-gray-100 text-gray-700 rounded-full text-sm whitespace-nowrap" data-keyword="gỏi">Gỏi / Cuốn</button>
+    </div>
+
+    <main class="p-4">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold text-gray-800">Quán chay dành cho bạn</h2>
+            <span id="shopCount" class="text-sm text-gray-500">Đang tải...</span>
+        </div>
+        
+        <div id="loading" class="flex justify-center items-center py-10">
+            <div class="spinner"></div>
+            <span class="ml-3 text-gray-500">Đang lấy dữ liệu từ hệ thống...</span>
+        </div>
+
+        <div id="shopList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            </div>
+    </main>
+
+    <div id="cartBottomBar" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] transition-transform duration-300 transform translate-y-full flex justify-between items-center z-50">
+        <div>
+            <p class="text-xs text-gray-500 mb-1">Đang chọn từ: <span id="cartShopName" class="font-semibold text-gray-700"></span></p>
+            <p class="text-xs text-gray-500 mb-1">Tổng đơn (<span id="cartCount">0</span> món)</p>
+            <p class="text-xl font-bold text-green-600" id="cartTotal">0đ</p>
+        </div>
+        <button onclick="checkoutZalo()" class="bg-[#0068FF] hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl flex items-center shadow-md">
+            <i class="fa-solid fa-paper-plane mr-2"></i> Gửi Zalo
+        </button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CẤU HÌNH FIREBASE CỦA BẠN
         const firebaseConfig = {
             apiKey: "AIzaSyCr8_G-zkKsr7JrI-gXuE6xNIZErYWWiM8",
             authDomain: "anchaysaigon-bd874.firebaseapp.com",
@@ -38,65 +81,193 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        function log(msg, isError = false) {
-            const color = isError ? 'text-red-600' : 'text-green-600';
-            document.getElementById('logArea').innerHTML += `<div class="${color}">> ${msg}</div>`;
-            const logBox = document.getElementById('logArea');
-            logBox.scrollTop = logBox.scrollHeight;
+        let allShops = []; // Biến lưu toàn bộ dữ liệu quán để lọc
+
+        // 1. TẢI DỮ LIỆU ĐỊA LÝ
+        async function loadCities() {
+            const citySelect = document.getElementById('citySelect');
+            try {
+                const q = query(collection(db, "locations"), orderBy("order"));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach((doc) => {
+                    const city = doc.data();
+                    citySelect.innerHTML += `<option value="${city.slug}">${city.name}</option>`;
+                });
+            } catch (error) { console.error("Lỗi tải thành phố:", error); }
         }
 
-        // DỮ LIỆU 20 QUÁN CHAY TP.HCM
-        const shopsData = [
-            { id: "veggie-saigon", name: "Veggie Saigon", city: "tphcm", address: "42 Đề Thám, Phường Cầu Ông Lãnh, Quận 1", zalo_phone: "0938123456", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80", menu: [{ name: "Nấm chiên giòn", price: 45000 }, { name: "Gỏi đu đủ chay", price: 55000 }, { name: "Xôi chiên chay", price: 35000 }] },
-            { id: "zenstay-vegan", name: "Zenstay - Simple Vegan Hospitality", city: "tphcm", address: "155 Võ Thị Sáu, Phường Võ Thị Sáu, Quận 3", zalo_phone: "0909108890", image: "https://images.unsplash.com/photo-1498837167922-41c46b66c068?w=500&q=80", menu: [{ name: "Bánh mì kẹp nấm nướng", price: 40000 }, { name: "Cà phê sữa hạt", price: 45000 }, { name: "Sinh tố xanh", price: 55000 }] },
-            { id: "vegan-cafe-247", name: "Vegan Cafe 247", city: "tphcm", address: "285 Cách Mạng Tháng 8, Phường 12, Quận 10", zalo_phone: "0901247247", image: "https://images.unsplash.com/photo-1550461716-406e94a86988?w=500&q=80", menu: [{ name: "Trà sen vàng macchiato chay", price: 50000 }, { name: "Bánh sừng trâu thuần chay", price: 45000 }, { name: "Cà phê ủ lạnh", price: 40000 }] },
-            { id: "pi-vegetarian", name: "Pi Vegetarian Bistro", city: "tphcm", address: "Lầu 1, 19 Võ Văn Tần, Phường 6, Quận 3", zalo_phone: "0916414133", image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&q=80", menu: [{ name: "Cà ri xanh Thái chay", price: 95000 }, { name: "Cơm chiên trái thơm", price: 85000 }, { name: "Súp bí đỏ kem dừa", price: 65000 }] },
-            { id: "hum-vegetarian", name: "Hum Vegetarian", city: "tphcm", address: "32 Võ Văn Tần, Phường 6, Quận 3", zalo_phone: "0899189229", image: "https://images.unsplash.com/photo-1604544525916-8608f029a1b1?w=500&q=80", menu: [{ name: "Gỏi củ hủ dừa", price: 120000 }, { name: "Nấm xúc bánh đa", price: 110000 }, { name: "Lẩu nấm chua cay", price: 250000 }] },
-            { id: "man-tu-vegan", name: "Mãn Tự Vegan", city: "tphcm", address: "201 Nguyễn Thị Minh Khai, Phường Nguyễn Cư Trinh, Quận 1", zalo_phone: "0797678333", image: "https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=500&q=80", menu: [{ name: "Cơm tấm sườn sả chay", price: 45000 }, { name: "Bún riêu chay", price: 40000 }, { name: "Gỏi cuốn mắm nêm chay", price: 15000 }] },
-            { id: "bep-xanh-an-duyen", name: "Bếp Xanh An Duyên", city: "tphcm", address: "10 Nguyễn Tri Phương, Phường 6, Quận 5", zalo_phone: "0908421461", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80", menu: [{ name: "Đậu hũ Tứ Xuyên", price: 75000 }, { name: "Cơm chiên cá mặn chay", price: 85000 }, { name: "Miến xào cua chay", price: 95000 }] },
-            { id: "chay-ba-xa", name: "Chay Bà Xã", city: "tphcm", address: "178/4 Pasteur, Phường Bến Nghé, Quận 1", zalo_phone: "0901306899", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80", menu: [{ name: "Pizza rau nấm chay", price: 130000 }, { name: "Bít tết đùi gà chay", price: 110000 }, { name: "Spaghetti sốt cà chua nấm", price: 90000 }] },
-            { id: "here-now-vegetarian", name: "Here & Now Vegetarian", city: "tphcm", address: "74/1 Phạm Viết Chánh, Bình Thạnh", zalo_phone: "0938450130", image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=500&q=80", menu: [{ name: "Pad Thái thuần chay", price: 65000 }, { name: "Salad rong nho sốt mè rang", price: 70000 }, { name: "Bún Thái chay", price: 55000 }] },
-            { id: "rou-vegetarian", name: "Rôu Vegetarian", city: "tphcm", address: "567A Trần Hưng Đạo, Phường Cầu Kho, Quận 1", zalo_phone: "0903331486", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&q=80", menu: [{ name: "Mì Quảng chay", price: 50000 }, { name: "Bánh xèo nấm kim châm", price: 65000 }, { name: "Chè hạt sen nhãn nhục", price: 30000 }] },
-            { id: "com-chay-mani", name: "Cơm Chay Mani", city: "tphcm", address: "291/2 Võ Văn Tần, Phường 5, Quận 3", zalo_phone: "0902956247", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80", menu: [{ name: "Cơm phần 3 món", price: 40000 }, { name: "Canh chua Nam Bộ chay", price: 25000 }, { name: "Thịt kho tàu chay", price: 35000 }] },
-            { id: "lau-chay-hoan-hy", name: "Lẩu Chay Hoan Hỷ", city: "tphcm", address: "73 Bà Hạt, Phường 9, Quận 10", zalo_phone: "0909112233", image: "https://images.unsplash.com/photo-1547592180-85f173990554?w=500&q=80", menu: [{ name: "Lẩu Thái chua cay", price: 150000 }, { name: "Chả giò Hoan Hỷ", price: 55000 }, { name: "Đậu hũ non chà bông chay", price: 45000 }] },
-            { id: "chay-garden", name: "Chay Garden Vegetarian", city: "tphcm", address: "52 Võ Văn Tần, Phường 6, Quận 3", zalo_phone: "0932151617", image: "https://images.unsplash.com/photo-1528650505193-4fcceb7b5123?w=500&q=80", menu: [{ name: "Cuốn tía tô nướng", price: 85000 }, { name: "Cà tím tay cầm", price: 95000 }, { name: "Súp rong biển hạt sen", price: 65000 }] },
-            { id: "kvegetarian", name: "KVegetarian - Restaurant & Café", city: "tphcm", address: "20/15 Phan Đăng Lưu, Phường 6, Phú Nhuận", zalo_phone: "0901533633", image: "https://images.unsplash.com/photo-1498837167922-41c46b66c068?w=500&q=80", menu: [{ name: "Bún nem nướng chay", price: 55000 }, { name: "Mẹt cuốn thập cẩm", price: 120000 }, { name: "Nước ép táo cần tây", price: 45000 }] },
-            { id: "doa-sen-vang", name: "Đóa Sen Vàng", city: "tphcm", address: "253/8 Nguyễn Văn Trỗi, Phường 10, Phú Nhuận", zalo_phone: "0918112244", image: "https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=500&q=80", menu: [{ name: "Lẩu nấm ngũ sắc", price: 220000 }, { name: "Bao tử chay xào sa tế", price: 75000 }, { name: "Cơm niêu lá dứa", price: 40000 }] },
-            { id: "bong-sung-vegetarian", name: "Bông Súng Vegetarian Food", city: "tphcm", address: "155 Nguyễn Đình Chiểu, Phường 6, Quận 3", zalo_phone: "0903332211", image: "https://images.unsplash.com/photo-1604544525916-8608f029a1b1?w=500&q=80", menu: [{ name: "Cơm chiên lá é", price: 70000 }, { name: "Gỏi hoa chuối tai heo chay", price: 85000 }, { name: "Bún gạo xào Singapore", price: 65000 }] },
-            { id: "ngoc-tho", name: "Quán Chay Ngọc Thọ", city: "tphcm", address: "175/9 Phạm Ngũ Lão, Quận 1", zalo_phone: "0938776655", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80", menu: [{ name: "Hủ tiếu Nam Vang chay", price: 35000 }, { name: "Hoành thánh chiên giòn", price: 30000 }, { name: "Sữa bắp nấu nấm", price: 20000 }] },
-            { id: "chay-phuong-mai", name: "Chay Phương Mai", city: "tphcm", address: "86F Võ Thị Sáu, Phường Tân Định, Quận 1", zalo_phone: "0888223344", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80", menu: [{ name: "Cơm thố Phương Mai", price: 85000 }, { name: "Nấm hầu thủ rang muối", price: 95000 }, { name: "Canh tiềm thuốc bắc chay", price: 60000 }] },
-            { id: "shamballa", name: "Shamballa Vegetarian", city: "tphcm", address: "17-19 Trịnh Văn Cấn, Quận 1", zalo_phone: "0902887766", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&q=80", menu: [{ name: "Bánh khọt chay", price: 85000 }, { name: "Gỏi cuốn lá mù tạt", price: 75000 }, { name: "Lẩu cháo nấm", price: 180000 }] },
-            { id: "bun-chay-co-lan", name: "Bún Chay Cô Lan", city: "tphcm", address: "Chợ Bến Thành, Cửa Đông, Quận 1", zalo_phone: "0905554433", image: "https://images.unsplash.com/photo-1550461716-406e94a86988?w=500&q=80", menu: [{ name: "Bún măng chay", price: 30000 }, { name: "Bún thịt nướng chay", price: 35000 }, { name: "Gỏi đu đủ tai heo chay", price: 25000 }] }
-        ];
+        // 2. TẢI DỮ LIỆU QUÁN & MENU
+        async function loadShops() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "shops"));
+                allShops = [];
+                querySnapshot.forEach((doc) => allShops.push(doc.data()));
+                
+                document.getElementById('loading').style.display = 'none';
+                renderShops(allShops); // Hiển thị ra màn hình
+            } catch (error) {
+                console.error("Lỗi tải quán:", error);
+                document.getElementById('loading').innerHTML = '<span class="text-red-500">Lỗi kết nối dữ liệu. Vui lòng thử lại.</span>';
+            }
+        }
 
-        document.getElementById('uploadBtn').addEventListener('click', async () => {
-            const btn = document.getElementById('uploadBtn');
-            btn.disabled = true;
-            btn.innerText = "⏳ Đang đẩy dữ liệu...";
-            log("Bắt đầu kết nối Firestore...");
-            
-            let successCount = 0;
-            
-            for (const shop of shopsData) {
-                try {
-                    // Firebase: Lưu từng quán vào collection 'shops'
-                    await setDoc(doc(db, "shops", shop.id), shop);
-                    log(`✅ Đã thêm: ${shop.name}`);
-                    successCount++;
-                } catch (error) {
-                    log(`❌ Lỗi (${shop.name}): ${error.message}`, true);
+        // 3. HIỂN THỊ QUÁN RA MÀN HÌNH
+        function renderShops(shopsToRender) {
+            const container = document.getElementById('shopList');
+            document.getElementById('shopCount').innerText = `${shopsToRender.length} địa điểm`;
+            container.innerHTML = '';
+
+            if(shopsToRender.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 col-span-full py-10">Không tìm thấy quán nào phù hợp.</p>';
+                return;
+            }
+
+            shopsToRender.forEach(shop => {
+                // Render Menu Items
+                let menuHtml = '';
+                if(shop.menu && shop.menu.length > 0) {
+                    shop.menu.forEach(item => {
+                        menuHtml += `
+                            <div class="flex justify-between items-center py-1">
+                                <span class="text-sm font-medium text-gray-700 max-w-[65%] truncate" title="${item.name}">${item.name}</span>
+                                <button onclick="addToCart('${shop.name}', '${item.name}', ${item.price}, '${shop.zalo_phone}')" 
+                                        class="text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded-md hover:bg-green-100 transition">
+                                    + ${item.price.toLocaleString('vi-VN')}đ
+                                </button>
+                            </div>
+                        `;
+                    });
+                } else {
+                    menuHtml = '<p class="text-xs text-gray-400 italic">Đang cập nhật thực đơn...</p>';
                 }
-            }
-            
-            if (successCount === shopsData.length) {
-                log("🎉 HOÀN TẤT! Đã đẩy 20 quán lên Firebase thành công.");
-                btn.innerText = "Đã thực hiện xong";
-            } else {
-                log("⚠️ Có lỗi xảy ra trong quá trình đẩy.", true);
-                btn.disabled = false;
-                btn.innerText = "Thử lại";
-            }
+
+                // Render Shop Card
+                const card = `
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition">
+                        <img src="${shop.image}" alt="${shop.name}" class="w-full h-40 object-cover">
+                        <div class="p-4">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-gray-800 truncate" title="${shop.name}">${shop.name}</h3>
+                                <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded shrink-0"><i class="fa-solid fa-star text-yellow-500"></i> Mới</span>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-1 mb-3 truncate" title="${shop.address}"><i class="fa-solid fa-location-dot mr-1"></i> ${shop.address}</p>
+                            
+                            <div class="border-t pt-2 space-y-1">
+                                ${menuHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        // 4. CHỨC NĂNG TÌM KIẾM & LỌC DỮ LIỆU
+        function filterData(keyword = '') {
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            const cityVal = document.getElementById('citySelect').value;
+            const tagVal = keyword.toLowerCase();
+
+            const filtered = allShops.filter(shop => {
+                // Lọc theo thành phố
+                if (cityVal && shop.city !== cityVal) return false;
+
+                // Lọc theo ô tìm kiếm (Tìm trong tên quán, địa chỉ hoặc tên món ăn)
+                let matchSearch = true;
+                if (searchVal) {
+                    const shopContent = (shop.name + " " + shop.address).toLowerCase();
+                    const menuContent = shop.menu ? shop.menu.map(m => m.name).join(" ").toLowerCase() : "";
+                    matchSearch = shopContent.includes(searchVal) || menuContent.includes(searchVal);
+                }
+
+                // Lọc theo Tag (Cơm, bún, lẩu...)
+                let matchTag = true;
+                if (tagVal) {
+                    const menuContent = shop.menu ? shop.menu.map(m => m.name).join(" ").toLowerCase() : "";
+                    matchTag = menuContent.includes(tagVal) || shop.name.toLowerCase().includes(tagVal);
+                }
+
+                return matchSearch && matchTag;
+            });
+
+            renderShops(filtered);
+        }
+
+        // Gắn sự kiện lắng nghe tìm kiếm
+        document.getElementById('searchInput').addEventListener('input', () => filterData());
+        document.getElementById('citySelect').addEventListener('change', () => filterData());
+        
+        // Gắn sự kiện cho các nút Tag (Cơm, Bún...)
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('bg-green-100', 'text-green-700', 'active');
+                    b.classList.add('bg-gray-100', 'text-gray-700');
+                });
+                e.target.classList.remove('bg-gray-100', 'text-gray-700');
+                e.target.classList.add('bg-green-100', 'text-green-700', 'active');
+                
+                filterData(e.target.dataset.keyword);
+            });
         });
+
+        // 5. LOGIC GIỎ HÀNG (Sử dụng window. để HTML gọi được từ xa)
+        window.cart = [];
+        window.currentShopZalo = "";
+        window.currentShopName = "";
+
+        window.addToCart = function(shopName, itemName, price, zaloPhone) {
+            // Kiểm tra: Chỉ cho đặt món của 1 quán cùng lúc để tránh nhầm đơn Zalo
+            if(window.cart.length > 0 && window.currentShopZalo !== zaloPhone) {
+                alert(`Bạn đang chọn món của quán ${window.currentShopName}. Vui lòng chốt đơn hoặc xóa giỏ hàng trước khi đặt quán khác!`);
+                return;
+            }
+
+            window.cart.push({ itemName, price });
+            window.currentShopZalo = zaloPhone;
+            window.currentShopName = shopName;
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const cartBar = document.getElementById('cartBottomBar');
+            if (window.cart.length > 0) {
+                cartBar.classList.remove('translate-y-full');
+                document.getElementById('cartCount').innerText = window.cart.length;
+                document.getElementById('cartShopName').innerText = window.currentShopName;
+                const total = window.cart.reduce((sum, item) => sum + item.price, 0);
+                document.getElementById('cartTotal').innerText = total.toLocaleString('vi-VN') + "đ";
+            }
+        }
+
+        window.checkoutZalo = function() {
+            if(window.cart.length === 0) return;
+            
+            let message = `*ĐƠN HÀNG TỪ ANCHAYSAIGON*\n`;
+            message += `Quán: ${window.currentShopName}\n`;
+            message += `------------------------\n`;
+            
+            let total = 0;
+            window.cart.forEach((item, i) => {
+                message += `${i + 1}. ${item.itemName} - ${item.price.toLocaleString('vi-VN')}đ\n`;
+                total += item.price;
+            });
+            message += `------------------------\n*Tổng cộng: ${total.toLocaleString('vi-VN')}đ*\n\nNhờ quán lên đơn giúp mình nhé! Cảm ơn quán.`;
+            
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://zalo.me/${window.currentShopZalo}?text=${encodedMessage}`, '_blank');
+            
+            // Hỏi khách có muốn xóa giỏ để đặt quán khác không
+            if(confirm("Hệ thống đã chuyển bạn sang Zalo. Bạn có muốn xóa giỏ hàng hiện tại để đặt món quán khác không?")) {
+                window.cart = [];
+                window.currentShopZalo = "";
+                document.getElementById('cartBottomBar').classList.add('translate-y-full');
+            }
+        }
+
+        // Khởi động hệ thống
+        loadCities();
+        loadShops();
     </script>
 </body>
 </html>
