@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cài đặt Dữ liệu - Ăn Chay Sài Gòn</title>
+    <title>Bơm Dữ Liệu Quán Ăn - Ăn Chay Sài Gòn</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-8">
 
-    <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-md text-center">
-        <h1 class="text-2xl font-bold text-green-600 mb-2">Bơm Dữ Liệu Lên Firebase</h1>
-        <p class="text-gray-600 mb-6 text-sm">Trang này sẽ tự động tạo danh mục 14 tỉnh thành vào Database của bạn.</p>
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-md text-center">
+        <h1 class="text-2xl font-bold text-orange-500 mb-2">Bơm Dữ Liệu 20 Quán Chay TP.HCM</h1>
+        <p class="text-gray-600 mb-6 text-sm">Trang này sẽ tự động đẩy danh sách 20 quán kèm menu vào Database của bạn.</p>
         
-        <button id="uploadBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg w-full shadow-md transition-all">
-            🚀 Bấm vào đây để đẩy dữ liệu
+        <button id="uploadBtn" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg w-full shadow-md transition-all">
+            🚀 Bấm vào đây để đẩy 20 Quán lên
         </button>
 
-        <div id="logArea" class="mt-6 text-left bg-gray-50 p-4 border rounded h-48 overflow-y-auto text-sm font-mono text-gray-700">
+        <div id="logArea" class="mt-6 text-left bg-gray-50 p-4 border rounded h-64 overflow-y-auto text-sm font-mono text-gray-700">
             Đang chờ lệnh...
         </div>
     </div>
@@ -25,15 +25,14 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CẤU HÌNH CỦA BẠN ĐÃ ĐƯỢC TÍCH HỢP
+        // CẤU HÌNH FIREBASE CỦA BẠN
         const firebaseConfig = {
             apiKey: "AIzaSyCr8_G-zkKsr7JrI-gXuE6xNIZErYWWiM8",
             authDomain: "anchaysaigon-bd874.firebaseapp.com",
             projectId: "anchaysaigon-bd874",
             storageBucket: "anchaysaigon-bd874.firebasestorage.app",
             messagingSenderId: "584356333421",
-            appId: "1:584356333421:web:06a6fec664ef20d9263c64",
-            measurementId: "G-ER6B839Y1G"
+            appId: "1:584356333421:web:06a6fec664ef20d9263c64"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -46,22 +45,28 @@
             logBox.scrollTop = logBox.scrollHeight;
         }
 
-        // Dữ liệu 14 tỉnh thành
-        const locationsData = [
-            { slug: "tphcm", name: "TP. Hồ Chí Minh", order: 1, districts: ["Quận 1", "Quận 3", "Quận 4", "Quận 5", "Quận 6", "Quận 7", "Quận 8", "Quận 10", "Quận 11", "Quận 12", "Tân Bình", "Bình Thạnh", "Phú Nhuận", "Gò Vấp", "Tân Phú", "Bình Tân", "TP Thủ Đức", "Bình Chánh", "Hóc Môn", "Nhà Bè"] },
-            { slug: "hanoi", name: "Hà Nội", order: 2, districts: ["Ba Đình", "Hoàn Kiếm", "Tây Hồ", "Long Biên", "Cầu Giấy", "Đống Đa", "Hai Bà Trưng", "Hoàng Mai", "Thanh Xuân", "Hà Đông", "Nam Từ Liêm", "Bắc Từ Liêm"] },
-            { slug: "danang", name: "Đà Nẵng", order: 3, districts: ["Hải Châu", "Thanh Khê", "Sơn Trà", "Ngũ Hành Sơn", "Liên Chiểu", "Cẩm Lệ", "Hòa Vang"] },
-            { slug: "haiphong", name: "Hải Phòng", order: 4, districts: ["Hồng Bàng", "Ngô Quyền", "Lê Chân", "Hải An", "Kiến An", "Đồ Sơn", "Dương Kinh", "Thủy Nguyên"] },
-            { slug: "ninhbinh", name: "Ninh Bình", order: 5, districts: ["TP. Ninh Bình", "Tam Điệp", "Nho Quan", "Gia Viễn", "Hoa Lư", "Yên Mô", "Yên Khánh", "Kim Sơn"] },
-            { slug: "dalat", name: "Đà Lạt", order: 6, districts: ["Phường 1", "Phường 2", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Xã Trạm Hành", "Xã Xuân Thọ"] },
-            { slug: "cantho", name: "Cần Thơ", order: 7, districts: ["Ninh Kiều", "Bình Thủy", "Cái Răng", "Ô Môn", "Thốt Nốt", "Phong Điền"] },
-            { slug: "hoian", name: "Hội An", order: 8, districts: ["Minh An", "Cẩm Phô", "Sơn Phong", "Cẩm Châu", "Cẩm An", "Cửa Đại"] },
-            { slug: "nhatrang", name: "Nha Trang", order: 9, districts: ["Lộc Thọ", "Tân Lập", "Phước Tiến", "Phước Hải", "Vĩnh Hải", "Vĩnh Nguyên"] },
-            { slug: "phuquoc", name: "Phú Quốc", order: 10, districts: ["Dương Đông", "An Thới", "Hàm Ninh", "Cửa Cạn", "Gành Dầu", "Bãi Thơm"] },
-            { slug: "sapa", name: "Sapa", order: 11, districts: ["Phường Sa Pa", "Phường Hàm Rồng", "Phường Ô Quý Hồ", "Xã Tả Van", "Xã Mường Hoa"] },
-            { slug: "phanthiet", name: "Phan Thiết", order: 12, districts: ["Phú Thủy", "Thanh Hải", "Bình Hưng", "Hàm Tiến", "Mũi Né", "Tiến Thành"] },
-            { slug: "quynhon", name: "Quy Nhơn", order: 13, districts: ["Lê Lợi", "Trần Phú", "Nguyễn Văn Cừ", "Ghềnh Ráng", "Nhơn Lý", "Nhơn Châu"] },
-            { slug: "hue", name: "Huế", order: 14, districts: ["Vĩnh Ninh", "Phú Nhuận", "Đông Ba", "Thuận Thành", "Vĩ Dạ", "Hương Long"] }
+        // DỮ LIỆU 20 QUÁN CHAY TP.HCM
+        const shopsData = [
+            { id: "veggie-saigon", name: "Veggie Saigon", city: "tphcm", address: "42 Đề Thám, Phường Cầu Ông Lãnh, Quận 1", zalo_phone: "0938123456", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80", menu: [{ name: "Nấm chiên giòn", price: 45000 }, { name: "Gỏi đu đủ chay", price: 55000 }, { name: "Xôi chiên chay", price: 35000 }] },
+            { id: "zenstay-vegan", name: "Zenstay - Simple Vegan Hospitality", city: "tphcm", address: "155 Võ Thị Sáu, Phường Võ Thị Sáu, Quận 3", zalo_phone: "0909108890", image: "https://images.unsplash.com/photo-1498837167922-41c46b66c068?w=500&q=80", menu: [{ name: "Bánh mì kẹp nấm nướng", price: 40000 }, { name: "Cà phê sữa hạt", price: 45000 }, { name: "Sinh tố xanh", price: 55000 }] },
+            { id: "vegan-cafe-247", name: "Vegan Cafe 247", city: "tphcm", address: "285 Cách Mạng Tháng 8, Phường 12, Quận 10", zalo_phone: "0901247247", image: "https://images.unsplash.com/photo-1550461716-406e94a86988?w=500&q=80", menu: [{ name: "Trà sen vàng macchiato chay", price: 50000 }, { name: "Bánh sừng trâu thuần chay", price: 45000 }, { name: "Cà phê ủ lạnh", price: 40000 }] },
+            { id: "pi-vegetarian", name: "Pi Vegetarian Bistro", city: "tphcm", address: "Lầu 1, 19 Võ Văn Tần, Phường 6, Quận 3", zalo_phone: "0916414133", image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&q=80", menu: [{ name: "Cà ri xanh Thái chay", price: 95000 }, { name: "Cơm chiên trái thơm", price: 85000 }, { name: "Súp bí đỏ kem dừa", price: 65000 }] },
+            { id: "hum-vegetarian", name: "Hum Vegetarian", city: "tphcm", address: "32 Võ Văn Tần, Phường 6, Quận 3", zalo_phone: "0899189229", image: "https://images.unsplash.com/photo-1604544525916-8608f029a1b1?w=500&q=80", menu: [{ name: "Gỏi củ hủ dừa", price: 120000 }, { name: "Nấm xúc bánh đa", price: 110000 }, { name: "Lẩu nấm chua cay", price: 250000 }] },
+            { id: "man-tu-vegan", name: "Mãn Tự Vegan", city: "tphcm", address: "201 Nguyễn Thị Minh Khai, Phường Nguyễn Cư Trinh, Quận 1", zalo_phone: "0797678333", image: "https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=500&q=80", menu: [{ name: "Cơm tấm sườn sả chay", price: 45000 }, { name: "Bún riêu chay", price: 40000 }, { name: "Gỏi cuốn mắm nêm chay", price: 15000 }] },
+            { id: "bep-xanh-an-duyen", name: "Bếp Xanh An Duyên", city: "tphcm", address: "10 Nguyễn Tri Phương, Phường 6, Quận 5", zalo_phone: "0908421461", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80", menu: [{ name: "Đậu hũ Tứ Xuyên", price: 75000 }, { name: "Cơm chiên cá mặn chay", price: 85000 }, { name: "Miến xào cua chay", price: 95000 }] },
+            { id: "chay-ba-xa", name: "Chay Bà Xã", city: "tphcm", address: "178/4 Pasteur, Phường Bến Nghé, Quận 1", zalo_phone: "0901306899", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80", menu: [{ name: "Pizza rau nấm chay", price: 130000 }, { name: "Bít tết đùi gà chay", price: 110000 }, { name: "Spaghetti sốt cà chua nấm", price: 90000 }] },
+            { id: "here-now-vegetarian", name: "Here & Now Vegetarian", city: "tphcm", address: "74/1 Phạm Viết Chánh, Bình Thạnh", zalo_phone: "0938450130", image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=500&q=80", menu: [{ name: "Pad Thái thuần chay", price: 65000 }, { name: "Salad rong nho sốt mè rang", price: 70000 }, { name: "Bún Thái chay", price: 55000 }] },
+            { id: "rou-vegetarian", name: "Rôu Vegetarian", city: "tphcm", address: "567A Trần Hưng Đạo, Phường Cầu Kho, Quận 1", zalo_phone: "0903331486", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&q=80", menu: [{ name: "Mì Quảng chay", price: 50000 }, { name: "Bánh xèo nấm kim châm", price: 65000 }, { name: "Chè hạt sen nhãn nhục", price: 30000 }] },
+            { id: "com-chay-mani", name: "Cơm Chay Mani", city: "tphcm", address: "291/2 Võ Văn Tần, Phường 5, Quận 3", zalo_phone: "0902956247", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80", menu: [{ name: "Cơm phần 3 món", price: 40000 }, { name: "Canh chua Nam Bộ chay", price: 25000 }, { name: "Thịt kho tàu chay", price: 35000 }] },
+            { id: "lau-chay-hoan-hy", name: "Lẩu Chay Hoan Hỷ", city: "tphcm", address: "73 Bà Hạt, Phường 9, Quận 10", zalo_phone: "0909112233", image: "https://images.unsplash.com/photo-1547592180-85f173990554?w=500&q=80", menu: [{ name: "Lẩu Thái chua cay", price: 150000 }, { name: "Chả giò Hoan Hỷ", price: 55000 }, { name: "Đậu hũ non chà bông chay", price: 45000 }] },
+            { id: "chay-garden", name: "Chay Garden Vegetarian", city: "tphcm", address: "52 Võ Văn Tần, Phường 6, Quận 3", zalo_phone: "0932151617", image: "https://images.unsplash.com/photo-1528650505193-4fcceb7b5123?w=500&q=80", menu: [{ name: "Cuốn tía tô nướng", price: 85000 }, { name: "Cà tím tay cầm", price: 95000 }, { name: "Súp rong biển hạt sen", price: 65000 }] },
+            { id: "kvegetarian", name: "KVegetarian - Restaurant & Café", city: "tphcm", address: "20/15 Phan Đăng Lưu, Phường 6, Phú Nhuận", zalo_phone: "0901533633", image: "https://images.unsplash.com/photo-1498837167922-41c46b66c068?w=500&q=80", menu: [{ name: "Bún nem nướng chay", price: 55000 }, { name: "Mẹt cuốn thập cẩm", price: 120000 }, { name: "Nước ép táo cần tây", price: 45000 }] },
+            { id: "doa-sen-vang", name: "Đóa Sen Vàng", city: "tphcm", address: "253/8 Nguyễn Văn Trỗi, Phường 10, Phú Nhuận", zalo_phone: "0918112244", image: "https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=500&q=80", menu: [{ name: "Lẩu nấm ngũ sắc", price: 220000 }, { name: "Bao tử chay xào sa tế", price: 75000 }, { name: "Cơm niêu lá dứa", price: 40000 }] },
+            { id: "bong-sung-vegetarian", name: "Bông Súng Vegetarian Food", city: "tphcm", address: "155 Nguyễn Đình Chiểu, Phường 6, Quận 3", zalo_phone: "0903332211", image: "https://images.unsplash.com/photo-1604544525916-8608f029a1b1?w=500&q=80", menu: [{ name: "Cơm chiên lá é", price: 70000 }, { name: "Gỏi hoa chuối tai heo chay", price: 85000 }, { name: "Bún gạo xào Singapore", price: 65000 }] },
+            { id: "ngoc-tho", name: "Quán Chay Ngọc Thọ", city: "tphcm", address: "175/9 Phạm Ngũ Lão, Quận 1", zalo_phone: "0938776655", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80", menu: [{ name: "Hủ tiếu Nam Vang chay", price: 35000 }, { name: "Hoành thánh chiên giòn", price: 30000 }, { name: "Sữa bắp nấu nấm", price: 20000 }] },
+            { id: "chay-phuong-mai", name: "Chay Phương Mai", city: "tphcm", address: "86F Võ Thị Sáu, Phường Tân Định, Quận 1", zalo_phone: "0888223344", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80", menu: [{ name: "Cơm thố Phương Mai", price: 85000 }, { name: "Nấm hầu thủ rang muối", price: 95000 }, { name: "Canh tiềm thuốc bắc chay", price: 60000 }] },
+            { id: "shamballa", name: "Shamballa Vegetarian", city: "tphcm", address: "17-19 Trịnh Văn Cấn, Quận 1", zalo_phone: "0902887766", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&q=80", menu: [{ name: "Bánh khọt chay", price: 85000 }, { name: "Gỏi cuốn lá mù tạt", price: 75000 }, { name: "Lẩu cháo nấm", price: 180000 }] },
+            { id: "bun-chay-co-lan", name: "Bún Chay Cô Lan", city: "tphcm", address: "Chợ Bến Thành, Cửa Đông, Quận 1", zalo_phone: "0905554433", image: "https://images.unsplash.com/photo-1550461716-406e94a86988?w=500&q=80", menu: [{ name: "Bún măng chay", price: 30000 }, { name: "Bún thịt nướng chay", price: 35000 }, { name: "Gỏi đu đủ tai heo chay", price: 25000 }] }
         ];
 
         document.getElementById('uploadBtn').addEventListener('click', async () => {
@@ -72,25 +77,24 @@
             
             let successCount = 0;
             
-            for (const city of locationsData) {
+            for (const shop of shopsData) {
                 try {
-                    // Firebase: Lưu từng tỉnh thành vào collection 'locations'
-                    await setDoc(doc(db, "locations", city.slug), city);
-                    log(`✅ Đã thêm: ${city.name}`);
+                    // Firebase: Lưu từng quán vào collection 'shops'
+                    await setDoc(doc(db, "shops", shop.id), shop);
+                    log(`✅ Đã thêm: ${shop.name}`);
                     successCount++;
                 } catch (error) {
-                    log(`❌ Lỗi (${city.name}): ${error.message}`, true);
-                    console.error(error);
+                    log(`❌ Lỗi (${shop.name}): ${error.message}`, true);
                 }
             }
             
-            if (successCount === locationsData.length) {
-                log("🎉 HOÀN TẤT! Đã đẩy toàn bộ 14 tỉnh thành lên Firebase thành công.");
+            if (successCount === shopsData.length) {
+                log("🎉 HOÀN TẤT! Đã đẩy 20 quán lên Firebase thành công.");
                 btn.innerText = "Đã thực hiện xong";
             } else {
-                log("⚠️ Quá trình hoàn tất nhưng có lỗi. Hãy kiểm tra lại rule bảo mật Firestore của bạn.", true);
-                btn.innerText = "Thử lại";
+                log("⚠️ Có lỗi xảy ra trong quá trình đẩy.", true);
                 btn.disabled = false;
+                btn.innerText = "Thử lại";
             }
         });
     </script>
