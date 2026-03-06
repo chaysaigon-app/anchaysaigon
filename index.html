@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công cụ Đẩy Dữ Liệu Địa Lý - Ăn Chay Sài Gòn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8 font-sans">
+
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold text-green-600 mb-4">Cài đặt Dữ liệu Địa lý Firebase</h1>
+        <p class="mb-4 text-gray-600">Công cụ này sẽ tự động tạo danh sách 14 tỉnh thành và các quận/huyện tương ứng vào Database của bạn.</p>
+        
+        <button id="uploadBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full transition">
+            🚀 Bắt đầu đẩy dữ liệu lên Firebase
+        </button>
+
+        <div class="mt-6">
+            <h3 class="font-bold text-gray-700">Trạng thái:</h3>
+            <ul id="logArea" class="mt-2 bg-gray-50 p-4 border rounded h-64 overflow-y-auto text-sm space-y-1 font-mono text-gray-800">
+                <li>Đang chờ lệnh...</li>
+            </ul>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // 1. DÁN CONFIG CỦA BẠN VÀO ĐÂY =========================
+        const firebaseConfig = {
+            apiKey: "MÃ_CỦA_BẠN",
+            authDomain: "anchaysaigon.firebaseapp.com", // Đổi theo của bạn
+            projectId: "anchaysaigon", // Đổi theo của bạn
+            storageBucket: "...",
+            messagingSenderId: "...",
+            appId: "..."
+        };
+        // ========================================================
+
+        // Khởi tạo Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Hàm ghi log ra màn hình
+        function logMessage(msg, isSuccess = true) {
+            const logArea = document.getElementById('logArea');
+            const color = isSuccess ? 'text-green-600' : 'text-red-600';
+            logArea.innerHTML += `<li class="${color}">> ${msg}</li>`;
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        // 2. DỮ LIỆU 14 TỈNH THÀNH ===============================
+        const locationsData = [
+            {
+                slug: "tphcm", name: "TP. Hồ Chí Minh", order: 1,
+                districts: ["Quận 1", "Quận 3", "Quận 4", "Quận 5", "Quận 6", "Quận 7", "Quận 8", "Quận 10", "Quận 11", "Quận 12", "Tân Bình", "Bình Thạnh", "Phú Nhuận", "Gò Vấp", "Tân Phú", "Bình Tân", "TP Thủ Đức", "Bình Chánh", "Hóc Môn", "Nhà Bè"]
+            },
+            {
+                slug: "hanoi", name: "Hà Nội", order: 2,
+                districts: ["Ba Đình", "Hoàn Kiếm", "Tây Hồ", "Long Biên", "Cầu Giấy", "Đống Đa", "Hai Bà Trưng", "Hoàng Mai", "Thanh Xuân", "Hà Đông", "Nam Từ Liêm", "Bắc Từ Liêm"]
+            },
+            {
+                slug: "danang", name: "Đà Nẵng", order: 3,
+                districts: ["Hải Châu", "Thanh Khê", "Sơn Trà", "Ngũ Hành Sơn", "Liên Chiểu", "Cẩm Lệ", "Hòa Vang"]
+            },
+            {
+                slug: "haiphong", name: "Hải Phòng", order: 4,
+                districts: ["Hồng Bàng", "Ngô Quyền", "Lê Chân", "Hải An", "Kiến An", "Đồ Sơn", "Dương Kinh", "Thủy Nguyên"]
+            },
+            {
+                slug: "ninhbinh", name: "Ninh Bình", order: 5,
+                districts: ["TP. Ninh Bình", "Tam Điệp", "Nho Quan", "Gia Viễn", "Hoa Lư", "Yên Mô", "Yên Khánh", "Kim Sơn"]
+            },
+            {
+                slug: "dalat", name: "Đà Lạt", order: 6,
+                districts: ["Phường 1", "Phường 2", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Xã Trạm Hành", "Xã Xuân Thọ"]
+            },
+            {
+                slug: "cantho", name: "Cần Thơ", order: 7,
+                districts: ["Ninh Kiều", "Bình Thủy", "Cái Răng", "Ô Môn", "Thốt Nốt", "Phong Điền"]
+            },
+            {
+                slug: "hoian", name: "Hội An", order: 8,
+                districts: ["Minh An", "Cẩm Phô", "Sơn Phong", "Cẩm Châu", "Cẩm An", "Cửa Đại"]
+            },
+            {
+                slug: "nhatrang", name: "Nha Trang", order: 9,
+                districts: ["Lộc Thọ", "Tân Lập", "Phước Tiến", "Phước Hải", "Vĩnh Hải", "Vĩnh Nguyên"]
+            },
+            {
+                slug: "phuquoc", name: "Phú Quốc", order: 10,
+                districts: ["Dương Đông", "An Thới", "Hàm Ninh", "Cửa Cạn", "Gành Dầu", "Bãi Thơm"]
+            },
+            {
+                slug: "sapa", name: "Sapa", order: 11,
+                districts: ["Phường Sa Pa", "Phường Hàm Rồng", "Phường Ô Quý Hồ", "Xã Tả Van", "Xã Mường Hoa"]
+            },
+            {
+                slug: "phanthiet", name: "Phan Thiết", order: 12,
+                districts: ["Phú Thủy", "Thanh Hải", "Bình Hưng", "Hàm Tiến", "Mũi Né", "Tiến Thành"]
+            },
+            {
+                slug: "quynhon", name: "Quy Nhơn", order: 13,
+                districts: ["Lê Lợi", "Trần Phú", "Nguyễn Văn Cừ", "Ghềnh Ráng", "Nhơn Lý", "Nhơn Châu"]
+            },
+            {
+                slug: "hue", name: "Huế", order: 14,
+                districts: ["Vĩnh Ninh", "Phú Nhuận", "Đông Ba", "Thuận Thành", "Vĩ Dạ", "Hương Long"]
+            }
+        ];
+
+        // 3. XỬ LÝ SỰ KIỆN CLICK =================================
+        document.getElementById('uploadBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('uploadBtn');
+            btn.disabled = true;
+            btn.innerText = "⏳ Đang xử lý...";
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            logMessage("Bắt đầu kết nối Firestore...");
+
+            let successCount = 0;
+            for (const city of locationsData) {
+                try {
+                    // Tạo một document trong collection 'locations' với ID là slug (ví dụ: 'tphcm')
+                    const cityRef = doc(db, "locations", city.slug);
+                    await setDoc(cityRef, city);
+                    
+                    logMessage(`✅ Đã thêm thành công: ${city.name}`);
+                    successCount++;
+                } catch (error) {
+                    logMessage(`❌ Lỗi khi thêm ${city.name}: ${error.message}`, false);
+                    console.error("Lỗi chi tiết:", error);
+                }
+            }
+
+            if (successCount === locationsData.length) {
+                logMessage("🎉 HOÀN TẤT! Đã đẩy toàn bộ 14 tỉnh thành lên Firebase.");
+            } else {
+                logMessage("⚠️ Đã xong, nhưng có một số mục bị lỗi. Vui lòng kiểm tra lại cấu hình rules của Firebase.", false);
+            }
+
+            btn.innerText = "Đã thực hiện xong";
+        });
+    </script>
+</body>
+</html>
