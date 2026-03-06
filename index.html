@@ -7,40 +7,73 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 6px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #22c55e; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-gray-50 font-sans pb-24">
+<body class="bg-gray-50 font-sans pb-24 relative">
 
     <div id="homeView" class="block">
         <header class="bg-green-600 text-white p-4 sticky top-0 z-40 shadow-md">
             <div class="flex justify-between items-center mb-4">
                 <h1 class="text-xl font-bold"><i class="fa-solid fa-leaf mr-2"></i>Ăn Chay Sài Gòn</h1>
-                <i class="fa-solid fa-bars text-xl cursor-pointer"></i>
+                <div class="flex items-center gap-4">
+                    <a href="https://zalo.me/0909108890" target="_blank" class="bg-green-700 hover:bg-green-800 text-white text-xs px-2.5 py-1.5 rounded flex items-center transition" title="Liên hệ Admin">
+                        <i class="fa-solid fa-headset mr-1"></i> Admin
+                    </a>
+                    <i class="fa-solid fa-bars text-xl cursor-pointer"></i>
+                </div>
             </div>
             
             <div class="flex gap-2 bg-white p-1 rounded-lg">
-                <select id="citySelect" class="bg-transparent text-gray-700 outline-none border-r border-gray-300 px-2 text-sm max-w-[130px] truncate">
-                    <option value="">Tất cả khu vực</option>
+                <select id="citySelect" class="bg-transparent text-gray-700 outline-none border-r border-gray-300 px-2 text-sm max-w-[110px] truncate">
+                    <option value="">Khu vực</option>
                 </select>
                 <input type="text" id="searchInput" placeholder="Tìm tên quán, món ăn..." class="w-full px-2 text-gray-700 outline-none text-sm">
                 <button class="bg-green-500 text-white px-3 py-1 rounded-md"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
         </header>
 
-        <div class="flex overflow-x-auto gap-3 p-4 bg-white shadow-sm hide-scroll" id="categoryTags">
-            <button class="filter-btn active px-4 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold whitespace-nowrap" data-keyword="">Tất cả</button>
-            <button class="filter-btn px-4 py-1 bg-gray-100 text-gray-700 rounded-full text-sm whitespace-nowrap" data-keyword="cơm">Cơm</button>
-            <button class="filter-btn px-4 py-1 bg-gray-100 text-gray-700 rounded-full text-sm whitespace-nowrap" data-keyword="bún">Bún / Phở</button>
-            <button class="filter-btn px-4 py-1 bg-gray-100 text-gray-700 rounded-full text-sm whitespace-nowrap" data-keyword="lẩu">Lẩu chay</button>
-            <button class="filter-btn px-4 py-1 bg-gray-100 text-gray-700 rounded-full text-sm whitespace-nowrap" data-keyword="gỏi">Gỏi / Cuốn</button>
+        <div class="bg-white px-4 pt-4 pb-2">
+            <a href="https://www.facebook.com/groups/anchaysaigon" target="_blank" class="flex items-center justify-between bg-gradient-to-r from-[#1877F2] to-[#3b82f6] text-white p-3.5 rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 active:scale-95">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white text-[#1877F2] rounded-full w-10 h-10 flex items-center justify-center shrink-0 shadow-inner">
+                        <i class="fa-brands fa-facebook-f text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm md:text-base leading-tight">Cộng Đồng Ăn Chay Sài Gòn</h3>
+                        <p class="text-[11px] md:text-xs text-blue-100 mt-0.5 line-clamp-2 leading-snug">Tham quan dạo chợ, gặp gỡ đối tác cung cấp món chay, thực phẩm chay tại TP.HCM.</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-white opacity-80 pl-2"></i>
+            </a>
+        </div>
+
+        <div class="flex overflow-x-auto gap-2.5 px-4 py-3 bg-white shadow-sm hide-scroll border-b border-gray-100" id="categoryTags">
+            <button class="filter-btn active px-4 py-1.5 bg-green-100 text-green-700 border border-green-200 rounded-full text-sm font-semibold whitespace-nowrap transition" data-keyword="">Tất cả</button>
+            <button class="filter-btn px-4 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap transition" data-keyword="cơm chay">Cơm chay</button>
+            <button class="filter-btn px-4 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap transition" data-keyword="cơm chay thập cẩm">Cơm thập cẩm</button>
+            <button class="filter-btn px-4 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap transition" data-keyword="bún chay">Bún chay</button>
+            <button class="filter-btn px-4 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap transition" data-keyword="phở chay">Phở chay</button>
+            <button class="filter-btn px-4 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap transition" data-keyword="mì chay">Mì chay</button>
+            <button class="filter-btn px-4 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap transition" data-keyword="hủ tiếu chay">Hủ tiếu chay</button>
+            <button class="filter-btn px-4 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap transition" data-keyword="thực phẩm chay">Thực phẩm chay</button>
+            <button class="filter-btn px-4 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap transition" data-keyword="sườn chay">Sườn chay</button>
+            <button class="filter-btn px-4 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap transition" data-keyword="đồ chay đông lạnh">Đồ chay đông lạnh</button>
+            <button class="filter-btn px-4 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap transition" data-keyword="đồ khô chay">Đồ khô chay</button>
+            <button class="filter-btn px-4 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap transition" data-keyword="gia vị chay">Gia vị chay</button>
+            <button class="filter-btn px-4 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap transition" data-keyword="rau củ">Rau củ</button>
+            <button class="filter-btn px-4 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap transition" data-keyword="hoa quả">Hoa quả</button>
         </div>
 
         <main class="p-4">
+            <div class="mb-5 flex flex-wrap gap-x-3 gap-y-2 items-center text-sm" id="locationLinksContainer">
+                <span class="font-bold text-gray-800"><i class="fa-solid fa-map-location-dot text-green-600 mr-1"></i> Tìm theo khu vực:</span>
+                </div>
+
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-bold text-gray-800">Khám phá quán chay</h2>
                 <span id="shopCount" class="text-sm text-gray-500">Đang tải...</span>
@@ -53,6 +86,11 @@
 
             <div id="shopList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 </div>
+
+            <div class="mt-12 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
+                <p class="mb-2">Ăn Chay Sài Gòn - Kết nối cộng đồng yêu ẩm thực chay</p>
+                <p>Cần hỗ trợ hoặc hợp tác? <a href="https://zalo.me/0909108890" target="_blank" class="text-blue-600 font-medium hover:underline">Liên hệ Zalo Admin</a></p>
+            </div>
         </main>
     </div>
 
@@ -107,7 +145,6 @@
 
     <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex-col justify-end transition-opacity">
         <div class="bg-white rounded-t-2xl p-4 w-full max-h-[80vh] flex flex-col transform transition-transform translate-y-full" id="cartModalContent">
-            
             <div class="flex justify-between items-center border-b pb-3 mb-3">
                 <div>
                     <h3 class="font-bold text-lg text-gray-800">Giỏ hàng của bạn</h3>
@@ -115,9 +152,7 @@
                 </div>
                 <button onclick="toggleCartModal(event)" class="text-gray-400 hover:text-gray-700 p-2 text-2xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
             <div id="cartItemsList" class="overflow-y-auto flex-1 space-y-4 py-2"></div>
-
             <div class="border-t pt-4 mt-2">
                 <div class="flex justify-between items-center font-bold text-lg mb-4">
                     <span class="text-gray-700">Tổng cộng:</span>
@@ -135,9 +170,7 @@
             <button onclick="closeZaloInstructionModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl"><i class="fa-solid fa-xmark"></i></button>
             
             <div class="text-center mb-4">
-                <div class="bg-blue-100 text-[#0068FF] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <i class="fa-brands fa-zalo text-3xl"></i>
-                </div>
+                <div class="bg-blue-100 text-[#0068FF] font-black text-2xl w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">Zalo</div>
                 <h3 class="font-bold text-xl text-gray-800">Gửi đơn cho quán</h3>
                 <p class="text-gray-600 text-sm mt-2">Do bảo mật của Zalo, bạn hãy thực hiện theo 2 bước sau:</p>
             </div>
@@ -182,21 +215,35 @@
 
         async function loadCities() {
             const citySelect = document.getElementById('citySelect');
+            const locationLinks = document.getElementById('locationLinksContainer');
             try {
                 const q = query(collection(db, "locations"), orderBy("order"));
                 const querySnapshot = await getDocs(q);
                 querySnapshot.forEach((doc) => {
                     const city = doc.data();
                     citySelect.innerHTML += `<option value="${city.slug}">${city.name}</option>`;
+                    locationLinks.innerHTML += `<a href="#" onclick="filterByLocation(event, '${city.slug}')" class="text-blue-600 hover:text-blue-800 hover:underline transition font-medium bg-blue-50 px-2 py-0.5 rounded border border-blue-100">${city.name}</a>`;
                 });
             } catch (error) { console.error("Lỗi:", error); }
+        }
+
+        window.filterByLocation = function(event, slug) {
+            event.preventDefault();
+            document.getElementById('citySelect').value = slug;
+            filterData();
+            document.getElementById('shopList').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         async function loadShops() {
             try {
                 const querySnapshot = await getDocs(collection(db, "shops"));
                 allShops = [];
-                querySnapshot.forEach((doc) => allShops.push({ id: doc.id, ...doc.data() }));
+                querySnapshot.forEach((doc) => {
+                    const shopData = doc.data();
+                    if (shopData.status !== "pending") {
+                        allShops.push({ id: doc.id, ...shopData });
+                    }
+                });
                 document.getElementById('loading').style.display = 'none';
                 renderShops(allShops);
             } catch (error) { console.error("Lỗi:", error); }
@@ -213,7 +260,7 @@
                         <img src="${shop.image}" alt="${shop.name}" class="w-full h-40 object-cover">
                         <div class="px-4 py-3">
                             <h3 class="font-bold text-lg text-gray-800 truncate" title="${shop.name}">${shop.name}</h3>
-                            <p class="text-gray-500 text-xs mt-1 truncate"><i class="fa-solid fa-location-dot mr-1"></i> ${shop.address}</p>
+                            <p class="text-gray-500 text-xs mt-1 truncate"><i class="fa-solid fa-location-dot mr-1 text-green-600"></i> ${shop.address}</p>
                             <p class="text-blue-600 text-xs font-semibold mt-1 mb-2"><i class="fa-solid fa-phone mr-1"></i> ${shop.zalo_phone}</p>
                             <div class="border-t pt-2 flex justify-between items-center text-sm text-green-600 font-medium">
                                 <span><i class="fa-solid fa-utensils mr-1"></i> Xem thực đơn</span>
@@ -229,7 +276,6 @@
         window.openShopDetail = function(shopId) {
             const shop = allShops.find(s => s.id === shopId);
             if(!shop) return;
-
             document.getElementById('homeView').classList.add('hidden');
             document.getElementById('shopDetailView').classList.remove('hidden');
             window.scrollTo(0, 0);
@@ -271,7 +317,6 @@
             document.getElementById('homeView').classList.remove('hidden');
         }
 
-        // --- LỌC DỮ LIỆU ---
         function filterData(keyword = '') {
             const searchVal = document.getElementById('searchInput').value.toLowerCase();
             const cityVal = document.getElementById('citySelect').value;
@@ -294,22 +339,23 @@
             });
             renderShops(filtered);
         }
+        
         document.getElementById('searchInput').addEventListener('input', () => filterData());
         document.getElementById('citySelect').addEventListener('change', () => filterData());
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.filter-btn').forEach(b => {
-                    b.classList.remove('bg-green-100', 'text-green-700', 'active');
-                    b.classList.add('bg-gray-100', 'text-gray-700');
+                    b.classList.remove('bg-green-100', 'text-green-700', 'active', 'border-green-200');
+                    b.classList.add('bg-gray-50', 'text-gray-600', 'border-gray-200');
                 });
-                e.target.classList.remove('bg-gray-100', 'text-gray-700');
-                e.target.classList.add('bg-green-100', 'text-green-700', 'active');
+                e.target.classList.remove('bg-gray-50', 'text-gray-600', 'border-gray-200');
+                e.target.classList.add('bg-green-100', 'text-green-700', 'active', 'border-green-200');
                 filterData(e.target.dataset.keyword);
             });
         });
 
         // ==========================================
-        // QUẢN LÝ GIỎ HÀNG 
+        // QUẢN LÝ GIỎ HÀNG & ZALO
         // ==========================================
         window.cart = [];
         window.currentShopZalo = "";
@@ -324,11 +370,8 @@
             window.currentShopName = shopName;
 
             let existingItem = window.cart.find(item => item.itemName === itemName);
-            if(existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                window.cart.push({ itemName, price, quantity: 1 });
-            }
+            if(existingItem) existingItem.quantity += 1;
+            else window.cart.push({ itemName, price, quantity: 1 });
             updateCartUI();
         }
 
@@ -349,16 +392,15 @@
             
             if (window.cart.length > 0) {
                 cartBar.classList.remove('translate-y-full');
+                
                 document.getElementById('cartModalShopName').innerText = window.currentShopName;
                 
-                let totalItems = 0;
-                let totalPrice = 0;
+                let totalItems = 0, totalPrice = 0;
                 listContainer.innerHTML = ''; 
 
                 window.cart.forEach((item, index) => {
                     totalItems += item.quantity;
                     totalPrice += item.price * item.quantity;
-
                     listContainer.innerHTML += `
                         <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
                             <div class="flex-1 pr-3">
@@ -366,14 +408,12 @@
                                 <p class="text-green-600 font-semibold text-sm">${(item.price * item.quantity).toLocaleString('vi-VN')}đ</p>
                             </div>
                             <div class="flex items-center bg-white border rounded-lg overflow-hidden shadow-sm">
-                                <button onclick="changeQuantity(${index}, -1)" class="px-3 py-1 text-gray-500 hover:bg-gray-100 active:bg-gray-200"><i class="fa-solid fa-minus text-xs"></i></button>
+                                <button onclick="changeQuantity(${index}, -1)" class="px-3 py-1 text-gray-500 hover:bg-gray-100"><i class="fa-solid fa-minus text-xs"></i></button>
                                 <span class="px-3 font-bold text-gray-700 min-w-[30px] text-center">${item.quantity}</span>
-                                <button onclick="changeQuantity(${index}, 1)" class="px-3 py-1 text-green-600 hover:bg-green-50 active:bg-green-100"><i class="fa-solid fa-plus text-xs"></i></button>
+                                <button onclick="changeQuantity(${index}, 1)" class="px-3 py-1 text-green-600 hover:bg-green-50"><i class="fa-solid fa-plus text-xs"></i></button>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
-
                 document.getElementById('cartBadge').innerText = totalItems;
                 document.getElementById('cartTotalShort').innerText = totalPrice.toLocaleString('vi-VN') + "đ";
                 document.getElementById('cartModalTotal').innerText = totalPrice.toLocaleString('vi-VN') + "đ";
@@ -388,30 +428,18 @@
             const modal = document.getElementById('cartModal');
             const content = document.getElementById('cartModalContent');
             const isOpen = forceState !== undefined ? forceState : modal.classList.contains('hidden');
-            
             if(isOpen && window.cart.length > 0) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
+                modal.classList.remove('hidden'); modal.classList.add('flex');
                 setTimeout(() => { content.classList.remove('translate-y-full'); }, 10);
             } else {
                 content.classList.add('translate-y-full');
-                setTimeout(() => { 
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                }, 300);
+                setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
             }
         }
 
-        // ==========================================
-        // CƠ CHẾ COPY ZALO BẢO ĐẢM 100% THÀNH CÔNG
-        // ==========================================
-        
-        // 1. Mở modal hướng dẫn
         window.showZaloInstructionModal = function(event) {
             if(event) event.stopPropagation();
             if(window.cart.length === 0) return;
-            
-            // Xây dựng text đơn hàng
             let message = `*ĐƠN HÀNG TỪ ANCHAYSAIGON*\nQuán: ${window.currentShopName}\n------------------------\n`;
             let total = 0;
             window.cart.forEach((item, i) => {
@@ -419,67 +447,38 @@
                 total += item.price * item.quantity;
             });
             message += `------------------------\n*Tổng cộng: ${total.toLocaleString('vi-VN')}đ*\n\nNhờ quán lên đơn giúp mình nhé! Cảm ơn quán.`;
-            
-            // Gán vào textarea ẩn
-            const textarea = document.getElementById('hiddenOrderText');
-            textarea.value = message;
-            
-            // Đóng giỏ hàng, mở modal hướng dẫn
+            document.getElementById('hiddenOrderText').value = message;
             toggleCartModal(null, false);
             document.getElementById('zaloInstructionModal').classList.remove('hidden');
             document.getElementById('zaloInstructionModal').classList.add('flex');
         }
 
-        // 2. Đóng modal hướng dẫn
         window.closeZaloInstructionModal = function() {
             document.getElementById('zaloInstructionModal').classList.add('hidden');
             document.getElementById('zaloInstructionModal').classList.remove('flex');
             document.getElementById('copySuccessMsg').classList.replace('opacity-100', 'opacity-0');
         }
 
-        // 3. Thực hiện Copy & Mở Zalo
         window.copyAndOpenZalo = function() {
             const textarea = document.getElementById('hiddenOrderText');
-            
-            // Kỹ thuật Copy truyền thống (fallback an toàn cho Mobile)
-            textarea.focus();
-            textarea.select();
-            
+            textarea.focus(); textarea.select();
             try {
-                // Thử dùng API mới trước
-                if (navigator.clipboard) {
-                    navigator.clipboard.writeText(textarea.value).then(successAction).catch(fallbackCopy);
-                } else {
-                    fallbackCopy();
-                }
-            } catch (err) {
-                fallbackCopy();
-            }
+                if (navigator.clipboard) navigator.clipboard.writeText(textarea.value).then(successAction).catch(fallbackCopy);
+                else fallbackCopy();
+            } catch (err) { fallbackCopy(); }
 
             function fallbackCopy() {
-                try {
-                    document.execCommand('copy');
-                    successAction();
-                } catch (e) {
-                    alert("Trình duyệt không hỗ trợ copy tự động. Bạn vui lòng copy thủ công nhé!");
-                }
+                try { document.execCommand('copy'); successAction(); } 
+                catch (e) { alert("Vui lòng copy thủ công nhé!"); }
             }
 
             function successAction() {
-                // Báo thành công
                 const msg = document.getElementById('copySuccessMsg');
                 msg.classList.replace('opacity-0', 'opacity-100');
-                
-                // Mở Zalo sau 1 giây
                 setTimeout(() => {
                     window.open(`https://zalo.me/${window.currentShopZalo}`, '_blank');
-                    
-                    // Reset trạng thái sau khi chuyển
                     setTimeout(() => {
-                        if(confirm("Hệ thống đã mở Zalo. Bạn có muốn làm mới giỏ hàng để tiếp tục chọn quán khác không?")) {
-                            window.cart = [];
-                            updateCartUI();
-                        }
+                        if(confirm("Hệ thống đã mở Zalo. Làm mới giỏ hàng để chọn quán khác?")) { window.cart = []; updateCartUI(); }
                         closeZaloInstructionModal();
                     }, 500);
                 }, 1000);
