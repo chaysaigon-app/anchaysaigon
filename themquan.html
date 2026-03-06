@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Quán Mới | Ăn Chay Sài Gòn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans p-4 md:p-8">
+
+    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+        
+        <div class="bg-green-600 text-white p-6">
+            <h1 class="text-2xl font-bold"><i class="fa-solid fa-store mr-2"></i>Thêm Quán Chay Mới</h1>
+            <p class="text-green-100 text-sm mt-1">Dữ liệu sẽ được đẩy trực tiếp lên Firebase</p>
+        </div>
+
+        <form id="addShopForm" class="p-6 space-y-6">
+            
+            <div class="space-y-4">
+                <h3 class="font-bold text-gray-800 border-b pb-2">1. Thông tin cơ bản</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tên Quán *</label>
+                        <input type="text" id="shopName" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="VD: Chay Diệu Tâm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Mã Quán (ID duy nhất) *</label>
+                        <input type="text" id="shopId" required class="w-full px-3 py-2 border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Sẽ tự tạo khi bạn gõ tên quán">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Thuộc Thành Phố *</label>
+                        <select id="shopCity" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option value="">-- Đang tải danh sách... --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại Zalo *</label>
+                        <input type="tel" id="shopZalo" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="VD: 0901234567">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ chi tiết *</label>
+                    <input type="text" id="shopAddress" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="VD: 123 Lê Lợi, Phường Bến Thành, Quận 1">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Link Ảnh Bìa (URL) *</label>
+                    <input type="url" id="shopImage" required class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Dán link ảnh (VD: https://...)">
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <h3 class="font-bold text-gray-800">2. Thực Đơn (Menu)</h3>
+                    <button type="button" onclick="addMenuItem()" class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 font-semibold"><i class="fa-solid fa-plus mr-1"></i> Thêm món</button>
+                </div>
+
+                <div id="menuContainer" class="space-y-3">
+                    </div>
+            </div>
+
+            <div class="pt-4 border-t">
+                <button type="submit" id="saveBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-colors flex justify-center items-center text-lg">
+                    <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Lưu Quán Lên Hệ Thống
+                </button>
+                <div id="statusMessage" class="mt-4 text-center text-sm font-semibold hidden"></div>
+            </div>
+
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCr8_G-zkKsr7JrI-gXuE6xNIZErYWWiM8",
+            authDomain: "anchaysaigon-bd874.firebaseapp.com",
+            projectId: "anchaysaigon-bd874",
+            storageBucket: "anchaysaigon-bd874.firebasestorage.app",
+            messagingSenderId: "584356333421",
+            appId: "1:584356333421:web:06a6fec664ef20d9263c64"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 1. Tự động tạo ID từ Tên Quán
+        function createSlug(str) {
+            return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd').replace(/([^0-9a-z-\s])/g, '').replace(/(\s+)/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, '');
+        }
+
+        document.getElementById('shopName').addEventListener('input', function(e) {
+            document.getElementById('shopId').value = createSlug(e.target.value);
+        });
+
+        // 2. Quản lý các ô nhập Menu
+        let menuItemCount = 0;
+        window.addMenuItem = function() {
+            menuItemCount++;
+            const container = document.getElementById('menuContainer');
+            const html = `
+                <div class="flex gap-2 bg-gray-50 p-3 rounded border menu-item-row" id="menuRow_${menuItemCount}">
+                    <div class="flex-1">
+                        <input type="text" class="menu-name w-full px-2 py-1.5 border rounded focus:ring-green-500 focus:outline-none text-sm" placeholder="Tên món (VD: Cơm tấm chay)" required>
+                    </div>
+                    <div class="w-1/3">
+                        <input type="number" class="menu-price w-full px-2 py-1.5 border rounded focus:ring-green-500 focus:outline-none text-sm" placeholder="Giá (VD: 35000)" required>
+                    </div>
+                    <button type="button" onclick="removeMenuItem(${menuItemCount})" class="text-red-500 hover:text-red-700 px-3"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        window.removeMenuItem = function(id) {
+            const row = document.getElementById(`menuRow_${id}`);
+            if (row) row.remove();
+        }
+        window.addMenuItem(); // Chạy 1 lần lúc mới load
+
+        // 3. Tải danh sách thành phố từ Firebase
+        async function loadCitiesToSelect() {
+            const citySelect = document.getElementById('shopCity');
+            try {
+                const querySnapshot = await getDocs(collection(db, "locations"));
+                citySelect.innerHTML = '<option value="">-- Chọn thành phố --</option>';
+                querySnapshot.forEach((doc) => {
+                    const city = doc.data();
+                    citySelect.innerHTML += `<option value="${city.slug}">${city.name}</option>`;
+                });
+            } catch (error) {
+                console.error("Lỗi tải thành phố: ", error);
+            }
+        }
+        loadCitiesToSelect();
+
+        // 4. Lưu dữ liệu
+        document.getElementById('addShopForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('saveBtn');
+            const statusDiv = document.getElementById('statusMessage');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang lưu...';
+            statusDiv.classList.add('hidden');
+
+            try {
+                const shopId = document.getElementById('shopId').value.trim();
+                const shopData = {
+                    name: document.getElementById('shopName').value.trim(),
+                    city: document.getElementById('shopCity').value,
+                    address: document.getElementById('shopAddress').value.trim(),
+                    zalo_phone: document.getElementById('shopZalo').value.trim(),
+                    image: document.getElementById('shopImage').value.trim(),
+                    menu: []
+                };
+
+                const menuRows = document.querySelectorAll('.menu-item-row');
+                menuRows.forEach(row => {
+                    const name = row.querySelector('.menu-name').value.trim();
+                    const price = parseInt(row.querySelector('.menu-price').value);
+                    if (name && price) {
+                        shopData.menu.push({ name: name, price: price });
+                    }
+                });
+
+                if(shopData.menu.length === 0) throw new Error("Vui lòng thêm ít nhất 1 món ăn.");
+
+                await setDoc(doc(db, "shops", shopId), shopData);
+
+                statusDiv.innerText = `✅ Đã thêm thành công quán: ${shopData.name}`;
+                statusDiv.className = "mt-4 text-center text-sm font-semibold text-green-600 block";
+                
+                this.reset();
+                document.getElementById('menuContainer').innerHTML = '';
+                window.addMenuItem();
+
+            } catch (error) {
+                console.error(error);
+                statusDiv.innerText = `❌ Lỗi: ${error.message}`;
+                statusDiv.className = "mt-4 text-center text-sm font-semibold text-red-600 block";
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-2"></i> Lưu Quán Lên Hệ Thống';
+            }
+        });
+    </script>
+</body>
+</html>
