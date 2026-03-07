@@ -217,6 +217,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         let allShops = []; 
+        
+        // TẠO BIẾN LƯU TÊN THÀNH PHỐ
+        window.cityMap = {};
 
         async function loadCities() {
             const citySelect = document.getElementById('citySelect');
@@ -226,6 +229,10 @@
                 const querySnapshot = await getDocs(q);
                 querySnapshot.forEach((doc) => {
                     const city = doc.data();
+                    
+                    // Lưu lại để lát nữa nối vào địa chỉ quán
+                    window.cityMap[city.slug] = city.name; 
+
                     citySelect.innerHTML += `<option value="${city.slug}">${city.name}</option>`;
                     locationLinks.innerHTML += `<a href="#" onclick="filterByLocation(event, '${city.slug}')" class="text-blue-600 hover:text-blue-800 hover:underline transition font-medium bg-blue-50 px-2 py-0.5 rounded border border-blue-100">${city.name}</a>`;
                 });
@@ -260,12 +267,17 @@
             container.innerHTML = '';
 
             shopsToRender.forEach(shop => {
+                // Lấy tên thành phố từ Map, nếu không có thì để trống
+                const cityName = window.cityMap[shop.city] || '';
+                // Nối tên thành phố vào địa chỉ
+                const fullAddress = cityName ? `${shop.address}, ${cityName}` : shop.address;
+
                 const card = `
                     <div onclick="openShopDetail('${shop.id}')" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 pb-2 cursor-pointer hover:shadow-md transition">
                         <img src="${shop.image}" alt="${shop.name}" class="w-full aspect-square object-cover">
                         <div class="px-4 py-3">
                             <h3 class="font-bold text-lg text-gray-800 truncate" title="${shop.name}">${shop.name}</h3>
-                            <p class="text-gray-500 text-xs mt-1 truncate"><i class="fa-solid fa-location-dot mr-1 text-green-600"></i> ${shop.address}</p>
+                            <p class="text-gray-500 text-xs mt-1 truncate" title="${fullAddress}"><i class="fa-solid fa-location-dot mr-1 text-green-600"></i> ${fullAddress}</p>
                             <p class="text-blue-600 text-xs font-semibold mt-1 mb-2"><i class="fa-solid fa-phone mr-1"></i> ${shop.zalo_phone}</p>
                             <div class="border-t pt-2 flex justify-between items-center text-sm text-green-600 font-medium">
                                 <span><i class="fa-solid fa-utensils mr-1"></i> Xem thực đơn</span>
@@ -285,10 +297,14 @@
             document.getElementById('shopDetailView').classList.remove('hidden');
             window.scrollTo(0, 0);
 
+            // Nối tên thành phố vào địa chỉ trong trang chi tiết
+            const cityName = window.cityMap[shop.city] || '';
+            const fullAddress = cityName ? `${shop.address}, ${cityName}` : shop.address;
+
             document.getElementById('detailHeaderName').innerText = shop.name;
             document.getElementById('detailName').innerText = shop.name;
             document.getElementById('detailImage').src = shop.image;
-            document.getElementById('addressText').innerText = shop.address;
+            document.getElementById('addressText').innerText = fullAddress;
             
             const phoneLink = document.getElementById('detailPhoneLink');
             phoneLink.innerText = shop.zalo_phone;
@@ -490,8 +506,13 @@
             }
         }
 
-        loadCities();
-        loadShops();
+        // KHỞI CHẠY HỆ THỐNG: Gọi loadCities trước để lấy tên Thành phố, sau đó mới load quán.
+        async function startApp() {
+            await loadCities();
+            await loadShops();
+        }
+        
+        startApp();
     </script>
 </body>
 </html>
