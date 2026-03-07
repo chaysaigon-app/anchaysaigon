@@ -112,7 +112,10 @@
         </header>
 
         <div class="bg-white pb-4 mb-2 shadow-sm">
-            <img id="detailImage" src="" alt="Cover" class="w-full aspect-square object-cover">
+            <div class="relative w-full pt-[100%] bg-gray-100">
+                <img id="detailImage" src="" alt="Cover" class="absolute top-0 left-0 w-full h-full object-cover">
+            </div>
+            
             <div class="px-4 pt-4">
                 <h2 id="detailName" class="text-2xl font-bold text-gray-800 mb-1">Tên quán</h2>
                 <p id="detailAddress" class="text-gray-500 text-sm mb-2"><i class="fa-solid fa-location-dot mr-1 text-green-600"></i> <span id="addressText">Địa chỉ</span></p>
@@ -261,7 +264,11 @@
 
                 const card = `
                     <div onclick="openShopDetail('${shop.id}')" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 pb-2 cursor-pointer hover:shadow-md transition">
-                        <img src="${shop.image}" alt="${shop.name}" class="w-full aspect-square object-cover">
+                        
+                        <div class="relative w-full pt-[100%] bg-gray-100 border-b border-gray-100">
+                            <img src="${shop.image}" alt="${shop.name}" class="absolute top-0 left-0 w-full h-full object-cover">
+                        </div>
+
                         <div class="px-4 py-3">
                             <h3 class="font-bold text-lg text-gray-800 truncate" title="${shop.name}">${shop.name}</h3>
                             <p class="text-gray-500 text-xs mt-1 truncate" title="${fullAddress}"><i class="fa-solid fa-location-dot mr-1 text-green-600"></i> ${fullAddress}</p>
@@ -308,7 +315,7 @@
                                 <p class="text-sm text-green-600 font-semibold mt-1">${item.price.toLocaleString('vi-VN')}đ</p>
                             </div>
                             <button onclick="addToCart('${shop.name}', '${item.name}', ${item.price}, '${shop.zalo_phone}')" 
-                                    class="text-green-600 bg-green-50 px-4 py-2 rounded-lg border border-green-200 hover:bg-green-500 hover:text-white transition shadow-sm font-bold flex items-center">
+                                    class="text-green-600 bg-green-50 px-4 py-2 rounded-lg border border-green-200 hover:bg-green-50 hover:text-white transition shadow-sm font-bold flex items-center">
                                 <i class="fa-solid fa-plus mr-1 text-sm"></i> Thêm
                             </button>
                         </div>
