@@ -10,7 +10,7 @@
     <script>
         if (sessionStorage.getItem("isAdmin") !== "true") {
             let pass = prompt("🔒 Khu vực Quản trị nội bộ.\nVui lòng nhập mật khẩu để tiếp tục:");
-            if (pass === "admin@8899") { 
+            if (pass === "admin8899") { 
                 sessionStorage.setItem("isAdmin", "true");
             } else {
                 alert("❌ Sai mật khẩu!");
@@ -58,7 +58,7 @@
                         <div>
                             <label class="block text-sm font-medium mb-1">Khu vực</label>
                             <select id="editShopCity" required class="w-full px-3 py-2 border rounded">
-                                </select>
+                            </select>
                         </div>
                         <div><label class="block text-sm font-medium mb-1">SĐT Zalo</label><input type="tel" id="editShopZalo" required class="w-full px-3 py-2 border rounded"></div>
                     </div>
@@ -69,11 +69,15 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Danh mục món bán</label>
                         <div class="flex flex-wrap gap-2" id="editCategorySelection">
                             <label class="cursor-pointer"><input type="checkbox" value="cơm chay" class="peer sr-only edit-shop-category"><span class="block px-3 py-1 text-sm bg-gray-50 border rounded-full peer-checked:bg-green-500 peer-checked:text-white transition">Cơm chay</span></label>
+                            <label class="cursor-pointer"><input type="checkbox" value="cơm tấm chay" class="peer sr-only edit-shop-category"><span class="block px-3 py-1 text-sm bg-gray-50 border rounded-full peer-checked:bg-green-500 peer-checked:text-white transition">Cơm tấm chay</span></label>
                             <label class="cursor-pointer"><input type="checkbox" value="cơm chay thập cẩm" class="peer sr-only edit-shop-category"><span class="block px-3 py-1 text-sm bg-gray-50 border rounded-full peer-checked:bg-green-500 peer-checked:text-white transition">Cơm thập cẩm</span></label>
-                            <label class="cursor-pointer"><input type="checkbox" value="mì chay" class="peer sr-only edit-shop-category"><span class="block px-3 py-1 text-sm bg-gray-50 border rounded-full peer-checked:bg-green-500 peer-checked:text-white transition">Mì chay</span></label>
+                            <label class="cursor-pointer"><input type="checkbox" value="bánh mì chay" class="peer sr-only edit-shop-category"><span class="block px-3 py-1 text-sm bg-gray-50 border rounded-full peer-checked:bg-green-500 peer-checked:text-white transition">Bánh mì chay</span></label>
                             <label class="cursor-pointer"><input type="checkbox" value="bún chay" class="peer sr-only edit-shop-category"><span class="block px-3 py-1 text-sm bg-gray-50 border rounded-full peer-checked:bg-green-500 peer-checked:text-white transition">Bún chay</span></label>
                             <label class="cursor-pointer"><input type="checkbox" value="phở chay" class="peer sr-only edit-shop-category"><span class="block px-3 py-1 text-sm bg-gray-50 border rounded-full peer-checked:bg-green-500 peer-checked:text-white transition">Phở chay</span></label>
+                            <label class="cursor-pointer"><input type="checkbox" value="mì chay" class="peer sr-only edit-shop-category"><span class="block px-3 py-1 text-sm bg-gray-50 border rounded-full peer-checked:bg-green-500 peer-checked:text-white transition">Mì chay</span></label>
                             <label class="cursor-pointer"><input type="checkbox" value="hủ tiếu chay" class="peer sr-only edit-shop-category"><span class="block px-3 py-1 text-sm bg-gray-50 border rounded-full peer-checked:bg-green-500 peer-checked:text-white transition">Hủ tiếu chay</span></label>
+                            <label class="cursor-pointer"><input type="checkbox" value="bánh chay" class="peer sr-only edit-shop-category"><span class="block px-3 py-1 text-sm bg-gray-50 border rounded-full peer-checked:bg-green-500 peer-checked:text-white transition">Bánh chay</span></label>
+                            <label class="cursor-pointer"><input type="checkbox" value="cafe chay" class="peer sr-only edit-shop-category"><span class="block px-3 py-1 text-sm bg-gray-50 border rounded-full peer-checked:bg-green-500 peer-checked:text-white transition">Cafe chay</span></label>
                             <label class="cursor-pointer"><input type="checkbox" value="thực phẩm chay" class="peer sr-only edit-shop-category"><span class="block px-3 py-1 text-sm bg-gray-50 border rounded-full peer-checked:bg-green-500 peer-checked:text-white transition">Thực phẩm chay</span></label>
                             <label class="cursor-pointer"><input type="checkbox" value="hoa quả" class="peer sr-only edit-shop-category"><span class="block px-3 py-1 text-sm bg-gray-50 border rounded-full peer-checked:bg-green-500 peer-checked:text-white transition">Hoa quả</span></label>
                             <label class="cursor-pointer"><input type="checkbox" value="rau củ" class="peer sr-only edit-shop-category"><span class="block px-3 py-1 text-sm bg-gray-50 border rounded-full peer-checked:bg-green-500 peer-checked:text-white transition">Rau củ</span></label>
@@ -102,7 +106,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCr8_G-zkKsr7JrI-gXuE6xNIZErYWWiM8",
@@ -116,7 +120,6 @@
         const db = getFirestore(app);
         let allShops = [];
 
-        // Load Khu vực vào ô Select trong form Sửa
         async function loadCitiesToEditForm() {
             const citySelect = document.getElementById('editShopCity');
             try {
@@ -137,9 +140,15 @@
             try {
                 const querySnapshot = await getDocs(collection(db, "shops"));
                 allShops = [];
-                // Ưu tiên hiển thị quán chờ duyệt (pending) lên đầu tiên
                 querySnapshot.forEach((doc) => allShops.push({ id: doc.id, ...doc.data() }));
-                allShops.sort((a, b) => (a.status === 'pending' ? -1 : 1)); 
+                
+                allShops.sort((a, b) => {
+                    if (a.status === 'pending') return -1;
+                    if (b.status === 'pending') return 1;
+                    if (a.status === 'hidden') return 1;
+                    if (b.status === 'hidden') return -1;
+                    return 0;
+                });
                 
                 document.getElementById('totalShops').innerText = allShops.length;
                 renderAdminShops(allShops);
@@ -152,18 +161,28 @@
             container.innerHTML = '';
             shopsToRender.forEach(shop => {
                 const isPending = shop.status === 'pending';
-                const statusBadge = isPending 
-                    ? `<span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded text-xs font-bold border border-yellow-200">Chờ duyệt</span>`
-                    : `<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold border border-green-200">Đã hiện</span>`;
+                const isHidden = shop.status === 'hidden';
+                
+                let statusBadge = '';
+                if(isPending) statusBadge = `<span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded text-xs font-bold border border-yellow-200">Chờ duyệt</span>`;
+                else if(isHidden) statusBadge = `<span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold border border-gray-300">Đã ẩn</span>`;
+                else statusBadge = `<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold border border-green-200">Đã hiện</span>`;
                 
                 const approveBtn = isPending 
-                    ? `<button onclick="approveShop('${shop.id}', '${shop.name}')" class="bg-green-500 text-white hover:bg-green-600 px-4 py-2 rounded-lg text-sm font-semibold transition flex-1 sm:flex-none shadow"><i class="fa-solid fa-check mr-1"></i> Duyệt lên Web</button>`
+                    ? `<button onclick="changeShopStatus('${shop.id}', '${shop.name}', 'approved')" class="bg-green-500 text-white hover:bg-green-600 px-4 py-2 rounded-lg text-sm font-semibold transition flex-1 sm:flex-none shadow"><i class="fa-solid fa-check mr-1"></i> Duyệt lên Web</button>`
                     : '';
                 
+                let toggleHideBtn = '';
+                if(isHidden) {
+                    toggleHideBtn = `<button onclick="changeShopStatus('${shop.id}', '${shop.name}', 'approved')" class="bg-green-50 text-green-600 hover:bg-green-600 hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex-1 sm:flex-none"><i class="fa-solid fa-eye mr-1"></i> Hiện lại</button>`;
+                } else {
+                    toggleHideBtn = `<button onclick="changeShopStatus('${shop.id}', '${shop.name}', 'hidden')" class="bg-gray-100 text-gray-600 hover:bg-gray-600 hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex-1 sm:flex-none"><i class="fa-solid fa-eye-slash mr-1"></i> Ẩn</button>`;
+                }
+
                 const categoryList = shop.categories ? shop.categories.join(', ') : 'Chưa cập nhật danh mục';
 
                 container.innerHTML += `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between hover:shadow-md transition">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between hover:shadow-md transition ${isHidden ? 'opacity-60' : ''}">
                         <div class="flex gap-4 items-center w-full sm:w-auto">
                             <img src="${shop.image}" class="w-16 h-16 rounded-lg object-cover border">
                             <div class="flex-1">
@@ -175,7 +194,7 @@
                         <div class="flex gap-2 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-3 sm:pt-0 mt-2 sm:mt-0">
                             ${approveBtn}
                             <button onclick="openEditModal('${shop.id}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex-1 sm:flex-none">Sửa</button>
-                            <button onclick="deleteShop('${shop.id}', '${shop.name}')" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex-1 sm:flex-none">Xóa</button>
+                            ${toggleHideBtn}
                         </div>
                     </div>`;
             });
@@ -186,21 +205,17 @@
             renderAdminShops(allShops.filter(s => s.name.toLowerCase().includes(val)));
         });
 
-        window.deleteShop = async function(shopId, shopName) {
-            if(confirm(`⚠️ CẢNH BÁO!\nBạn có chắc chắn muốn xóa vĩnh viễn quán [${shopName}] khỏi hệ thống không?`)) {
-                await deleteDoc(doc(db, "shops", shopId));
+        window.changeShopStatus = async function(shopId, shopName, newStatus) {
+            let msg = '';
+            if (newStatus === 'hidden') msg = `Bạn có chắc muốn ẨN quán [${shopName}] khỏi trang chủ không?`;
+            else msg = `Xác nhận HIỂN THỊ quán [${shopName}] lên trang chủ?`;
+
+            if(confirm(msg)) {
+                await updateDoc(doc(db, "shops", shopId), { status: newStatus });
                 loadAdminShops();
             }
         }
 
-        window.approveShop = async function(shopId, shopName) {
-            if(confirm(`Xác nhận hiển thị quán [${shopName}] lên trang chủ anchaysaigon.com?`)) {
-                await updateDoc(doc(db, "shops", shopId), { status: "approved" });
-                loadAdminShops();
-            }
-        }
-
-        // CHỈNH SỬA
         let editItemCount = 0;
         window.openEditModal = function(shopId) {
             const shop = allShops.find(s => s.id === shopId);
@@ -212,10 +227,7 @@
             document.getElementById('editShopAddress').value = shop.address;
             document.getElementById('editShopImage').value = shop.image;
 
-            // Xóa checked cũ ở Danh Mục
             document.querySelectorAll('.edit-shop-category').forEach(cb => cb.checked = false);
-            
-            // Check lại những danh mục quán đang có
             if(shop.categories) {
                 shop.categories.forEach(cat => {
                     const checkbox = document.querySelector(`.edit-shop-category[value="${cat}"]`);
@@ -254,8 +266,6 @@
         window.saveEditShop = async function() {
             const shopId = document.getElementById('editShopId').value;
             const btn = document.getElementById('btnSaveEdit');
-            
-            // Lấy danh sách các danh mục được chọn
             const checkedCategories = Array.from(document.querySelectorAll('.edit-shop-category:checked')).map(cb => cb.value);
 
             btn.disabled = true;
@@ -269,7 +279,7 @@
                     address: document.getElementById('editShopAddress').value.trim(),
                     image: document.getElementById('editShopImage').value.trim(),
                     status: document.getElementById('editShopStatus').value,
-                    categories: checkedCategories, // Lưu lại danh mục
+                    categories: checkedCategories, 
                     menu: []
                 };
 
@@ -281,7 +291,7 @@
 
                 await updateDoc(doc(db, "shops", shopId), updatedData);
                 closeEditModal(); 
-                loadAdminShops(); // Render lại danh sách ngay lập tức
+                loadAdminShops(); 
             } catch(e) {
                 alert("Lỗi: " + e.message);
             } finally {
