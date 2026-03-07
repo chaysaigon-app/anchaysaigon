@@ -108,7 +108,7 @@
         </header>
 
         <div class="bg-white pb-4 mb-2 shadow-sm">
-            <img id="detailImage" src="" alt="Cover" class="w-full h-56 object-cover">
+            <img id="detailImage" src="" alt="Cover" class="w-full aspect-square object-cover">
             <div class="px-4 pt-4">
                 <h2 id="detailName" class="text-2xl font-bold text-gray-800 mb-1">Tên quán</h2>
                 <p id="detailAddress" class="text-gray-500 text-sm mb-2"><i class="fa-solid fa-location-dot mr-1 text-green-600"></i> <span id="addressText">Địa chỉ</span></p>
@@ -262,7 +262,7 @@
             shopsToRender.forEach(shop => {
                 const card = `
                     <div onclick="openShopDetail('${shop.id}')" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 pb-2 cursor-pointer hover:shadow-md transition">
-                        <img src="${shop.image}" alt="${shop.name}" class="w-full h-40 object-cover">
+                        <img src="${shop.image}" alt="${shop.name}" class="w-full aspect-square object-cover">
                         <div class="px-4 py-3">
                             <h3 class="font-bold text-lg text-gray-800 truncate" title="${shop.name}">${shop.name}</h3>
                             <p class="text-gray-500 text-xs mt-1 truncate"><i class="fa-solid fa-location-dot mr-1 text-green-600"></i> ${shop.address}</p>
