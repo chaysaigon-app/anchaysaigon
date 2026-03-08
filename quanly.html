@@ -10,7 +10,7 @@
     <script>
         if (sessionStorage.getItem("isAdmin") !== "true") {
             let pass = prompt("🔒 Khu vực Quản trị nội bộ.\nVui lòng nhập mật khẩu để tiếp tục:");
-            if (pass === "admin8899") { 
+            if (pass === "admin@8899") { 
                 sessionStorage.setItem("isAdmin", "true");
             } else {
                 alert("❌ Sai mật khẩu!");
