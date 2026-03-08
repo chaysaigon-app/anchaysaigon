@@ -27,7 +27,14 @@
     </div>
 
     <div class="max-w-4xl mx-auto p-4 mt-4">
-        <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+        
+        <div id="reportSection" class="hidden mb-8">
+            <h2 class="text-lg font-bold text-red-600 mb-3"><i class="fa-solid fa-bell mr-2 animate-pulse"></i>Báo cáo từ cộng đồng (<span id="reportCount">0</span>)</h2>
+            <div id="reportList" class="space-y-3">
+                </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-col sm:flex-row justify-between items-center gap-4 border-t-4 border-green-500">
             <h2 class="font-bold text-gray-700">Tổng số: <span id="totalShops" class="text-green-600 text-xl">0</span> quán</h2>
             <div class="relative w-full sm:w-64">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400"></i>
@@ -53,17 +60,16 @@
                     <input type="hidden" id="editShopId">
                     <input type="hidden" id="editShopStatus"> 
                     
-                    <div><label class="block text-sm font-medium mb-1">Tên Quán</label><input type="text" id="editShopName" required class="w-full px-3 py-2 border rounded"></div>
+                    <div><label class="block text-sm font-medium mb-1">Tên Quán</label><input type="text" id="editShopName" required class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium mb-1">Khu vực</label>
-                            <select id="editShopCity" required class="w-full px-3 py-2 border rounded">
-                            </select>
+                            <select id="editShopCity" required class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></select>
                         </div>
-                        <div><label class="block text-sm font-medium mb-1">SĐT Zalo</label><input type="tel" id="editShopZalo" required class="w-full px-3 py-2 border rounded"></div>
+                        <div><label class="block text-sm font-medium mb-1">SĐT Zalo</label><input type="tel" id="editShopZalo" required class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
                     </div>
-                    <div><label class="block text-sm font-medium mb-1">Địa chỉ</label><input type="text" id="editShopAddress" required class="w-full px-3 py-2 border rounded"></div>
-                    <div><label class="block text-sm font-medium mb-1">Link Ảnh Bìa</label><input type="url" id="editShopImage" required class="w-full px-3 py-2 border rounded"></div>
+                    <div><label class="block text-sm font-medium mb-1">Địa chỉ</label><input type="text" id="editShopAddress" required class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                    <div><label class="block text-sm font-medium mb-1">Link Ảnh Bìa</label><input type="url" id="editShopImage" required class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"></div>
                     
                     <div class="pt-4 border-t mt-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Danh mục món bán</label>
@@ -106,7 +112,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCr8_G-zkKsr7JrI-gXuE6xNIZErYWWiM8",
@@ -133,6 +139,84 @@
             } catch (error) { console.error(error); }
         }
 
+        // ==========================================
+        // XỬ LÝ BÁO CÁO CỘNG ĐỒNG
+        // ==========================================
+        async function loadReports() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "reports"));
+                let reports = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.status === "new") reports.push({ id: doc.id, ...data });
+                });
+                
+                const reportSection = document.getElementById('reportSection');
+                const reportList = document.getElementById('reportList');
+                document.getElementById('reportCount').innerText = reports.length;
+
+                if (reports.length > 0) {
+                    reportSection.classList.remove('hidden');
+                    reportList.innerHTML = '';
+                    
+                    // Sắp xếp báo cáo mới nhất lên đầu
+                    reports.sort((a, b) => b.timestamp - a.timestamp); 
+                    
+                    reports.forEach(report => {
+                        const dateObj = new Date(report.timestamp);
+                        const timeStr = dateObj.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) + ' - ' + dateObj.toLocaleDateString('vi-VN');
+                        
+                        reportList.innerHTML += `
+                            <div class="bg-red-50 border border-red-200 p-4 rounded-xl flex flex-col md:flex-row justify-between md:items-center gap-3 shadow-sm">
+                                <div>
+                                    <p class="text-xs text-gray-500 mb-1"><i class="fa-regular fa-clock mr-1"></i> ${timeStr}</p>
+                                    <h4 class="font-bold text-gray-800"><span class="text-red-600">Quán bị báo cáo:</span> ${report.shopName}</h4>
+                                    <p class="text-sm text-red-700 mt-1 font-medium bg-white inline-block px-2 py-0.5 rounded border border-red-100"><i class="fa-solid fa-circle-exclamation mr-1"></i> ${report.reason}</p>
+                                </div>
+                                <div class="flex flex-wrap gap-2 mt-2 md:mt-0">
+                                    <button onclick="openEditModal('${report.shopId}')" class="bg-white border border-blue-300 text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg text-sm font-semibold transition">
+                                        Sửa thông tin
+                                    </button>
+                                    <button onclick="handleReport('${report.id}', '${report.shopId}', 'hide')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold transition shadow-sm">
+                                        <i class="fa-solid fa-eye-slash mr-1"></i> Ẩn & Đóng BC
+                                    </button>
+                                    <button onclick="handleReport('${report.id}', '${report.shopId}', 'dismiss')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-lg text-sm font-semibold transition">
+                                        <i class="fa-solid fa-check mr-1"></i> Bỏ qua
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    reportSection.classList.add('hidden');
+                }
+            } catch (error) { console.error("Lỗi tải báo cáo:", error); }
+        }
+
+        window.handleReport = async function(reportId, shopId, action) {
+            try {
+                if (action === 'hide') {
+                    if(!confirm("Hành động này sẽ ẨN quán khỏi trang chủ và đánh dấu báo cáo đã xử lý. Tiếp tục?")) return;
+                    
+                    try { await updateDoc(doc(db, "shops", shopId), { status: 'hidden' }); } 
+                    catch(e) { console.warn("Quán không tồn tại hoặc đã xóa."); }
+                    
+                    await updateDoc(doc(db, "reports", reportId), { status: 'resolved' });
+                    
+                } else if (action === 'dismiss') {
+                    if(!confirm("Đánh dấu báo cáo này là ĐÃ XỬ LÝ (Không ẩn quán)?")) return;
+                    await updateDoc(doc(db, "reports", reportId), { status: 'resolved' });
+                }
+                
+                // Tải lại cả báo cáo và danh sách quán
+                loadReports();
+                loadAdminShops();
+            } catch (error) { alert("Lỗi: " + error.message); }
+        }
+
+        // ==========================================
+        // DANH SÁCH QUÁN BÊN DƯỚI
+        // ==========================================
         async function loadAdminShops() {
             document.getElementById('loading').classList.remove('hidden');
             const container = document.getElementById('adminShopList');
@@ -142,6 +226,7 @@
                 allShops = [];
                 querySnapshot.forEach((doc) => allShops.push({ id: doc.id, ...doc.data() }));
                 
+                // Sắp xếp: Chờ duyệt (trên cùng) -> Đã hiện -> Đã ẩn (dưới cùng)
                 allShops.sort((a, b) => {
                     if (a.status === 'pending') return -1;
                     if (b.status === 'pending') return 1;
@@ -169,12 +254,12 @@
                 else statusBadge = `<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold border border-green-200">Đã hiện</span>`;
                 
                 const approveBtn = isPending 
-                    ? `<button onclick="changeShopStatus('${shop.id}', '${shop.name}', 'approved')" class="bg-green-500 text-white hover:bg-green-600 px-4 py-2 rounded-lg text-sm font-semibold transition flex-1 sm:flex-none shadow"><i class="fa-solid fa-check mr-1"></i> Duyệt lên Web</button>`
+                    ? `<button onclick="changeShopStatus('${shop.id}', '${shop.name}', 'approved')" class="bg-green-500 text-white hover:bg-green-600 px-4 py-2 rounded-lg text-sm font-semibold transition flex-1 sm:flex-none shadow"><i class="fa-solid fa-check mr-1"></i> Duyệt</button>`
                     : '';
                 
                 let toggleHideBtn = '';
                 if(isHidden) {
-                    toggleHideBtn = `<button onclick="changeShopStatus('${shop.id}', '${shop.name}', 'approved')" class="bg-green-50 text-green-600 hover:bg-green-600 hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex-1 sm:flex-none"><i class="fa-solid fa-eye mr-1"></i> Hiện lại</button>`;
+                    toggleHideBtn = `<button onclick="changeShopStatus('${shop.id}', '${shop.name}', 'approved')" class="bg-green-50 text-green-600 hover:bg-green-600 hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex-1 sm:flex-none"><i class="fa-solid fa-eye mr-1"></i> Mở lại</button>`;
                 } else {
                     toggleHideBtn = `<button onclick="changeShopStatus('${shop.id}', '${shop.name}', 'hidden')" class="bg-gray-100 text-gray-600 hover:bg-gray-600 hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex-1 sm:flex-none"><i class="fa-solid fa-eye-slash mr-1"></i> Ẩn</button>`;
                 }
@@ -182,7 +267,7 @@
                 const categoryList = shop.categories ? shop.categories.join(', ') : 'Chưa cập nhật danh mục';
 
                 container.innerHTML += `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between hover:shadow-md transition ${isHidden ? 'opacity-60' : ''}">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between hover:shadow-md transition ${isHidden ? 'opacity-50 grayscale-[50%]' : ''}">
                         <div class="flex gap-4 items-center w-full sm:w-auto">
                             <img src="${shop.image}" class="w-16 h-16 rounded-lg object-cover border">
                             <div class="flex-1">
@@ -195,6 +280,7 @@
                             ${approveBtn}
                             <button onclick="openEditModal('${shop.id}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex-1 sm:flex-none">Sửa</button>
                             ${toggleHideBtn}
+                            <button onclick="deleteShop('${shop.id}', '${shop.name}')" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-2 rounded-lg text-sm font-semibold transition flex-none" title="Xóa vĩnh viễn"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>`;
             });
@@ -208,7 +294,7 @@
         window.changeShopStatus = async function(shopId, shopName, newStatus) {
             let msg = '';
             if (newStatus === 'hidden') msg = `Bạn có chắc muốn ẨN quán [${shopName}] khỏi trang chủ không?`;
-            else msg = `Xác nhận HIỂN THỊ quán [${shopName}] lên trang chủ?`;
+            else msg = `Xác nhận HIỂN THỊ LẠI quán [${shopName}] lên trang chủ?`;
 
             if(confirm(msg)) {
                 await updateDoc(doc(db, "shops", shopId), { status: newStatus });
@@ -216,9 +302,20 @@
             }
         }
 
+        // Nút xóa vĩnh viễn (được làm nhỏ lại bằng icon thùng rác)
+        window.deleteShop = async function(shopId, shopName) {
+            if(confirm(`⚠️ CẢNH BÁO!\nBạn có chắc chắn muốn XÓA VĨNH VIỄN quán [${shopName}] khỏi cơ sở dữ liệu không?`)) {
+                await deleteDoc(doc(db, "shops", shopId));
+                loadAdminShops();
+            }
+        }
+
         let editItemCount = 0;
         window.openEditModal = function(shopId) {
             const shop = allShops.find(s => s.id === shopId);
+            // Nếu bấm sửa từ báo cáo mà không tìm thấy shop trong allShops (có thể do lỗi), báo lỗi
+            if(!shop) { alert("Lỗi: Không tìm thấy dữ liệu quán này."); return; }
+
             document.getElementById('editShopId').value = shop.id;
             document.getElementById('editShopStatus').value = shop.status || "approved"; 
             document.getElementById('editShopName').value = shop.name;
@@ -300,7 +397,9 @@
             }
         }
         
+        // Khởi chạy cả 2 bảng: Báo cáo & Danh sách quán
         loadCitiesToEditForm();
+        loadReports();
         loadAdminShops();
     </script>
 </body>
