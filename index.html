@@ -125,9 +125,13 @@
                     <a href="#" id="detailPhoneLink" class="font-bold text-blue-600 hover:underline">09...</a>
                 </p>
                 
-                <div class="flex gap-2 text-xs">
-                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded"><i class="fa-solid fa-clock mr-1"></i>Đang mở cửa</span>
-                    <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded"><i class="fa-solid fa-star mr-1"></i>4.8 Đánh giá</span>
+                <div class="flex justify-between items-center mt-3 border-t pt-3">
+                    <div class="flex gap-2 text-xs">
+                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded font-medium"><i class="fa-solid fa-clock mr-1"></i>Đang mở cửa</span>
+                    </div>
+                    <button id="btnReportDetail" class="text-red-500 bg-red-50 hover:bg-red-100 px-3 py-1 rounded text-xs font-semibold transition border border-red-100">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> Báo cáo lỗi
+                    </button>
                 </div>
             </div>
         </div>
@@ -135,6 +139,35 @@
         <div class="p-4 bg-white shadow-sm min-h-screen">
             <h3 class="font-bold text-lg text-gray-800 mb-4 border-b pb-2">Thực đơn đặt món</h3>
             <div id="detailMenuList" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <div id="reportModal" class="fixed inset-0 bg-black bg-opacity-60 z-[80] hidden justify-center items-center p-4 transition-opacity">
+        <div class="bg-white rounded-xl p-5 w-full max-w-sm shadow-2xl relative animate-[fadeIn_0.3s_ease-out]">
+            <button onclick="closeReportModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl"><i class="fa-solid fa-xmark"></i></button>
+            
+            <h3 class="font-bold text-lg text-red-600 mb-1"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Báo cáo cửa hàng</h3>
+            <p class="text-sm text-gray-600 mb-4 pb-3 border-b">Quán: <strong id="reportShopName" class="text-gray-800"></strong></p>
+
+            <p class="text-sm font-bold text-gray-700 mb-2">Vui lòng chọn lý do:</p>
+            <div class="space-y-2 mb-2">
+                <label class="flex items-start gap-2.5 cursor-pointer p-2.5 hover:bg-red-50 rounded-lg border border-gray-100 hover:border-red-200 transition">
+                    <input type="radio" name="reportReason" value="Cửa hàng không hoạt động" class="mt-0.5 w-4 h-4 text-red-600 focus:ring-red-500" checked>
+                    <span class="text-sm text-gray-700 leading-tight"><strong>Cửa hàng không hoạt động</strong><br><span class="text-xs text-gray-500">Đã đóng cửa, dẹp tiệm, nghỉ bán...</span></span>
+                </label>
+                
+                <label class="flex items-start gap-2.5 cursor-pointer p-2.5 hover:bg-red-50 rounded-lg border border-gray-100 hover:border-red-200 transition">
+                    <input type="radio" name="reportReason" value="Thông tin sai" class="mt-0.5 w-4 h-4 text-red-600 focus:ring-red-500">
+                    <span class="text-sm text-gray-700 leading-tight"><strong>Thông tin không chính xác</strong><br><span class="text-xs text-gray-500">Sai địa chỉ, số điện thoại, giá món...</span></span>
+                </label>
+            </div>
+
+            <input type="hidden" id="reportShopId">
+
+            <button onclick="submitReport()" id="btnSubmitReport" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl mt-4 transition shadow-md">
+                Gửi báo cáo cho Admin
+            </button>
+            <p id="reportSuccessMsg" class="text-green-600 text-center text-sm font-semibold mt-4 hidden"><i class="fa-solid fa-circle-check mr-1"></i> Cảm ơn bạn! Ban quản trị sẽ kiểm tra sớm nhất.</p>
         </div>
     </div>
 
@@ -198,9 +231,14 @@
         </div>
     </div>
 
+    <style>
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+
     <script type="module">
+        // ĐÃ IMPORT THÊM "addDoc" ĐỂ LƯU BÁO CÁO LÊN FIREBASE
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCr8_G-zkKsr7JrI-gXuE6xNIZErYWWiM8",
@@ -263,7 +301,7 @@
                 const fullAddress = cityName ? `${shop.address}, ${cityName}` : shop.address;
 
                 const card = `
-                    <div onclick="openShopDetail('${shop.id}')" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 pb-2 cursor-pointer hover:shadow-md transition">
+                    <div onclick="openShopDetail('${shop.id}')" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 pb-2 cursor-pointer hover:shadow-md transition relative">
                         
                         <div class="relative w-full pt-[100%] bg-gray-100 border-b border-gray-100">
                             <img src="${shop.image}" alt="${shop.name}" class="absolute top-0 left-0 w-full h-full object-cover">
@@ -273,9 +311,13 @@
                             <h3 class="font-bold text-lg text-gray-800 truncate" title="${shop.name}">${shop.name}</h3>
                             <p class="text-gray-500 text-xs mt-1 truncate" title="${fullAddress}"><i class="fa-solid fa-location-dot mr-1 text-green-600"></i> ${fullAddress}</p>
                             <p class="text-blue-600 text-xs font-semibold mt-1 mb-2"><i class="fa-solid fa-phone mr-1"></i> ${shop.zalo_phone}</p>
-                            <div class="border-t pt-2 flex justify-between items-center text-sm text-green-600 font-medium">
-                                <span><i class="fa-solid fa-utensils mr-1"></i> Xem thực đơn</span>
-                                <i class="fa-solid fa-chevron-right text-xs"></i>
+                            
+                            <div class="border-t pt-2 mt-1 flex justify-between items-center">
+                                <span class="text-sm text-green-600 font-medium"><i class="fa-solid fa-utensils mr-1"></i> Xem thực đơn</span>
+                                
+                                <button onclick="openReportModal(event, '${shop.id}', '${shop.name}')" class="text-red-500 bg-red-50 hover:bg-red-100 px-2 py-1 rounded text-xs font-semibold transition border border-red-100">
+                                    <i class="fa-solid fa-flag mr-1"></i> Báo cáo
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -284,9 +326,17 @@
             });
         }
 
+        let currentDetailShopId = '';
+        let currentDetailShopName = '';
+
         window.openShopDetail = function(shopId) {
             const shop = allShops.find(s => s.id === shopId);
             if(!shop) return;
+            
+            // Lưu lại ID và Tên để dùng cho nút Báo cáo bên trong
+            currentDetailShopId = shop.id;
+            currentDetailShopName = shop.name;
+
             document.getElementById('homeView').classList.add('hidden');
             document.getElementById('shopDetailView').classList.remove('hidden');
             window.scrollTo(0, 0);
@@ -302,6 +352,9 @@
             const phoneLink = document.getElementById('detailPhoneLink');
             phoneLink.innerText = shop.zalo_phone;
             phoneLink.href = `tel:${shop.zalo_phone}`;
+            
+            // Gán sự kiện cho nút Báo cáo bên trong chi tiết
+            document.getElementById('btnReportDetail').onclick = (e) => openReportModal(e, currentDetailShopId, currentDetailShopName);
 
             const menuContainer = document.getElementById('detailMenuList');
             menuContainer.innerHTML = '';
@@ -315,7 +368,7 @@
                                 <p class="text-sm text-green-600 font-semibold mt-1">${item.price.toLocaleString('vi-VN')}đ</p>
                             </div>
                             <button onclick="addToCart('${shop.name}', '${item.name}', ${item.price}, '${shop.zalo_phone}')" 
-                                    class="text-green-600 bg-green-50 px-4 py-2 rounded-lg border border-green-200 hover:bg-green-50 hover:text-white transition shadow-sm font-bold flex items-center">
+                                    class="text-green-600 bg-green-50 px-4 py-2 rounded-lg border border-green-200 hover:bg-green-500 hover:text-white transition shadow-sm font-bold flex items-center">
                                 <i class="fa-solid fa-plus mr-1 text-sm"></i> Thêm
                             </button>
                         </div>
@@ -331,6 +384,64 @@
             document.getElementById('homeView').classList.remove('hidden');
         }
 
+        // ==========================================
+        // TÍNH NĂNG BÁO CÁO CỬA HÀNG
+        // ==========================================
+        window.openReportModal = function(event, shopId, shopName) {
+            if(event) event.stopPropagation(); // Ngăn việc bấm nhầm vào mở chi tiết quán
+            
+            document.getElementById('reportShopId').value = shopId;
+            document.getElementById('reportShopName').innerText = shopName;
+            
+            document.getElementById('reportSuccessMsg').classList.add('hidden');
+            document.getElementById('btnSubmitReport').style.display = 'block';
+            
+            document.getElementById('reportModal').classList.remove('hidden');
+            document.getElementById('reportModal').classList.add('flex');
+        }
+
+        window.closeReportModal = function() {
+            document.getElementById('reportModal').classList.add('hidden');
+            document.getElementById('reportModal').classList.remove('flex');
+        }
+
+        window.submitReport = async function() {
+            const shopId = document.getElementById('reportShopId').value;
+            const shopName = document.getElementById('reportShopName').innerText;
+            const reason = document.querySelector('input[name="reportReason"]:checked').value;
+            const btn = document.getElementById('btnSubmitReport');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang gửi báo cáo...';
+
+            try {
+                // Đẩy báo cáo lên Firebase vào bảng 'reports'
+                await addDoc(collection(db, "reports"), {
+                    shopId: shopId,
+                    shopName: shopName,
+                    reason: reason,
+                    timestamp: new Date().getTime(),
+                    status: "new" // Trạng thái báo cáo mới
+                });
+                
+                document.getElementById('reportSuccessMsg').classList.remove('hidden');
+                btn.style.display = 'none'; // Ẩn nút gửi đi sau khi gửi xong
+                
+                // Tự động đóng sau 2.5 giây
+                setTimeout(() => {
+                    closeReportModal();
+                    btn.disabled = false;
+                    btn.innerHTML = 'Gửi báo cáo cho Admin';
+                }, 2500);
+
+            } catch(error) {
+                alert("Lỗi khi gửi báo cáo: " + error.message);
+                btn.disabled = false;
+                btn.innerHTML = 'Gửi báo cáo cho Admin';
+            }
+        }
+
+        // BỘ LỌC TÌM KIẾM
         function filterData(keyword = '') {
             const searchVal = document.getElementById('searchInput').value.toLowerCase();
             const cityVal = document.getElementById('citySelect').value;
@@ -369,6 +480,9 @@
             });
         });
 
+        // ==========================================
+        // QUẢN LÝ GIỎ HÀNG & ZALO
+        // ==========================================
         window.cart = [];
         window.currentShopZalo = "";
         window.currentShopName = "";
