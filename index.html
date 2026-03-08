@@ -37,7 +37,24 @@
             </div>
         </header>
 
-        <div class="bg-white px-4 pt-4 pb-2">
+        <div class="bg-white px-4 pt-4 pb-2 space-y-3">
+            
+            <a href="https://anchaysaigon.com/themquan.html" target="_blank" class="flex items-center justify-between bg-gradient-to-r from-orange-500 via-red-500 to-pink-600 text-white p-3.5 rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 active:scale-95 relative overflow-hidden">
+                <div class="absolute -right-2 -top-2 opacity-20 transform rotate-12">
+                    <i class="fa-solid fa-store text-6xl"></i>
+                </div>
+                <div class="flex items-center gap-3 relative z-10">
+                    <div class="bg-white text-red-500 rounded-full w-10 h-10 flex items-center justify-center shrink-0 shadow-lg font-black text-xl animate-bounce">
+                        <i class="fa-solid fa-gift"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-sm md:text-base leading-tight uppercase drop-shadow-sm">Đăng ký Đối tác MIỄN PHÍ</h3>
+                        <p class="text-[11px] md:text-xs text-white opacity-90 mt-0.5 leading-snug font-medium">Bán món chay? Mở gian hàng 0đ - Nhận đơn Zalo!</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-arrow-right text-white opacity-90 pl-1 relative z-10 text-lg"></i>
+            </a>
+
             <a href="https://www.facebook.com/groups/anchaysaigon" target="_blank" class="flex items-center justify-between bg-gradient-to-r from-[#1877F2] to-[#3b82f6] text-white p-3.5 rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 active:scale-95">
                 <div class="flex items-center gap-3">
                     <div class="bg-white text-[#1877F2] rounded-full w-10 h-10 flex items-center justify-center shrink-0 shadow-inner">
@@ -45,7 +62,7 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-sm md:text-base leading-tight">Cộng Đồng Ăn Chay Sài Gòn</h3>
-                        <p class="text-[11px] md:text-xs text-blue-100 mt-0.5 line-clamp-2 leading-snug">Tham quan dạo chợ, gặp gỡ đối tác cung cấp món chay, thực phẩm chay tại TP.HCM.</p>
+                        <p class="text-[11px] md:text-xs text-blue-100 mt-0.5 line-clamp-2 leading-snug">Tham quan dạo chợ, gặp gỡ đối tác cung cấp món chay.</p>
                     </div>
                 </div>
                 <i class="fa-solid fa-chevron-right text-white opacity-80 pl-2"></i>
@@ -236,7 +253,6 @@
     </style>
 
     <script type="module">
-        // ĐÃ IMPORT THÊM "addDoc" ĐỂ LƯU BÁO CÁO LÊN FIREBASE
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, query, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -333,7 +349,6 @@
             const shop = allShops.find(s => s.id === shopId);
             if(!shop) return;
             
-            // Lưu lại ID và Tên để dùng cho nút Báo cáo bên trong
             currentDetailShopId = shop.id;
             currentDetailShopName = shop.name;
 
@@ -353,7 +368,6 @@
             phoneLink.innerText = shop.zalo_phone;
             phoneLink.href = `tel:${shop.zalo_phone}`;
             
-            // Gán sự kiện cho nút Báo cáo bên trong chi tiết
             document.getElementById('btnReportDetail').onclick = (e) => openReportModal(e, currentDetailShopId, currentDetailShopName);
 
             const menuContainer = document.getElementById('detailMenuList');
@@ -388,7 +402,7 @@
         // TÍNH NĂNG BÁO CÁO CỬA HÀNG
         // ==========================================
         window.openReportModal = function(event, shopId, shopName) {
-            if(event) event.stopPropagation(); // Ngăn việc bấm nhầm vào mở chi tiết quán
+            if(event) event.stopPropagation(); 
             
             document.getElementById('reportShopId').value = shopId;
             document.getElementById('reportShopName').innerText = shopName;
@@ -415,19 +429,17 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang gửi báo cáo...';
 
             try {
-                // Đẩy báo cáo lên Firebase vào bảng 'reports'
                 await addDoc(collection(db, "reports"), {
                     shopId: shopId,
                     shopName: shopName,
                     reason: reason,
                     timestamp: new Date().getTime(),
-                    status: "new" // Trạng thái báo cáo mới
+                    status: "new" 
                 });
                 
                 document.getElementById('reportSuccessMsg').classList.remove('hidden');
-                btn.style.display = 'none'; // Ẩn nút gửi đi sau khi gửi xong
+                btn.style.display = 'none'; 
                 
-                // Tự động đóng sau 2.5 giây
                 setTimeout(() => {
                     closeReportModal();
                     btn.disabled = false;
@@ -441,7 +453,6 @@
             }
         }
 
-        // BỘ LỌC TÌM KIẾM
         function filterData(keyword = '') {
             const searchVal = document.getElementById('searchInput').value.toLowerCase();
             const cityVal = document.getElementById('citySelect').value;
@@ -480,9 +491,6 @@
             });
         });
 
-        // ==========================================
-        // QUẢN LÝ GIỎ HÀNG & ZALO
-        // ==========================================
         window.cart = [];
         window.currentShopZalo = "";
         window.currentShopName = "";
